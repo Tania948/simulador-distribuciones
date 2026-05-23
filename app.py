@@ -125,8 +125,7 @@ if datos is not None:
             # Gráfica para discretas: Barras para simulación, Stem para teoría
             valores, cuentas = np.unique(datos, return_counts=True)
             ax.bar(valores, cuentas / len(datos), alpha=0.5, color="#1f77b4", edgecolor="black", label="Simulado (Empírico)")
-            ax.stem(x_teorico, linea_teorica, linefmt="#d62728-", markerfmt="#d62728o", basefmt=" ", label="Teórico (PMF)")
-            ax.set_ylabel("Probabilidad")
+            ax.stem(x_teorico, linea_teorica, linefmt="#d62728-", markerfmt="#d62728o", basefmt=" ", label="Teórico (PMF)")            ax.set_ylabel("Probabilidad")
         else:
             # Gráfica para continuas: Histograma normalizado y curva PDF
             ax.hist(datos, bins=30, density=True, alpha=0.5, color="#2ca02c", edgecolor="black", label="Simulado (Histograma)")
