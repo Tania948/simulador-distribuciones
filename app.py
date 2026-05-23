@@ -2,7 +2,7 @@ import streamlit as st
 
 # 1. Configuración de la interfaz
 st.set_page_config(page_title="Simulador Estadístico", layout="wide")
-st.title("📊 Simulador de Distribuciones - Probabilidad y estadistica")
+st.title("Simulador de Distribuciones - Probabilidad y estadistica")
 
 # 2. Menú de navegación en la barra lateral
 st.sidebar.header("Navegación")
