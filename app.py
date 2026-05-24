@@ -1,17 +1,21 @@
 import streamlit as st
 
 # Fondo
-st.set_page_config(page_title="Simulador Estadístico", layout="wide")
+st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
 st.title("Simulador de Distribuciones - Probabilidad y estadistica")
 
+#N global
+st.sidebar.header("Tamaño de la muestra")
+st.sidebar.markdown("(Este parámetro afecta a todas las distribuciones)")
+tamano_muestra = st.sidebar.number_input("Ingrese el tamaño de la muestra", min_value=1, max_value=100000, value=1000)
+st.session_state['tamano_muestra'] = tamano_muestra
+
 # Menu de opciones
-st.sidebar.title("Selecciona una distribución")
-distribucion = st.sidebar.selectbox
-("Tipo de distribución", ["Bernoulli", 
-                          "Binomial",
-                          "Geometrica",
-                          "Hipergeometrica",
-                          "Poisson"])
-
-
-
+pestanas = st.tabs([
+    "Inicio",
+    "Bernoulli", 
+    "Binomial", 
+    "Geometrica", 
+    "Hipergeometrica", 
+    "Poisson"
+])
