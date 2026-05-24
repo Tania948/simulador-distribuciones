@@ -36,7 +36,7 @@ pestanas = st.tabs([
 ])
 
 with pestanas[0]:
-    st.header("Menu principal", initial_sidebar_state="centered")
+    st.markdown("<h2 style='text-align: center; color: #FF69B4;'>Menu principal</h2>", unsafe_allow_html=True)
 
 with pestanas[1]:
-    st.write("Simulador de distribución Bernoulli")
+    st.markdown("<h2 style='color: #FF69B4;'>Distribución de Bernoulli</h2>", unsafe_allow_html=True)
