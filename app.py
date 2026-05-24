@@ -36,7 +36,7 @@ pestanas = st.tabs([
 ])
 
 with pestanas[0]:
-    st.write("Menu principal")
+    st.header("Menu principal", initial_sidebar_state="centered")
 
 with pestanas[1]:
     st.write("Simulador de distribución Bernoulli")
