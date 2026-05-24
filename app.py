@@ -37,8 +37,8 @@ pestanas = st.tabs([
 
 with pestanas[0]:
     st.markdown("<h2 style='text-align: center; color: #FF69B4;'>Inicio</h2>", unsafe_allow_html=True)
-    st.text("Seleccione la distribución que desea simular en las pestañas superiores. Ajuste el tamaño de la muestra en la barra lateral para ver cómo afecta a las distribuciones.")
-    st.text("Seleccione **Guardar** para ver o descargar aquí las simulaciones deseadas.")
+    st.text("<h2 style='text-align: center;'>Seleccione la distribución que desea simular en las pestañas superiores. Ajuste el tamaño de la muestra en la barra lateral para ver cómo afecta a las distribuciones.</h2>", unsafe_allow_html=True)
+    st.text("<h2 style='text-align: center;'>Seleccione <strong>Guardar</strong> para ver o descargar aquí las simulaciones deseadas.</h2>", unsafe_allow_html=True)
 
 with pestanas[1]:
     st.markdown("<h2 style='text-align: center; color: #FF69B4;'>Distribución de Bernoulli</h2>", unsafe_allow_html=True)
