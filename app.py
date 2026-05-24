@@ -34,7 +34,6 @@ pestanas = st.tabs([
     "Hipergeometrica", 
     "Poisson"
 ])
-pestanas("<h2 style='color: #FF69B4'; margin-bottom: 0;>")
 
 with pestanas[0]:
     st.write("Menu principal")
