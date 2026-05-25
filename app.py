@@ -1,5 +1,6 @@
 import streamlit as st
 
+#Paginas
 from subpaginas.inicio import mostrar_inicio
 
 # Fondo
@@ -38,7 +39,7 @@ pestanas = st.tabs([
 ])
 
 with pestanas[0]:
-   mostrar_inicio()
+   inicioMostrar()
     
 with pestanas[1]:
     st.markdown("<h2 style='text-align: center; color: #FF69B4;'>Distribución de Bernoulli</h2>", unsafe_allow_html=True)
