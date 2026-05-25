@@ -9,4 +9,4 @@ def solicitar_parametros():
 
 def inicializar_binomial():
     intro_binomial()
-    solicitar_parametros
+    solicitar_parametros()
