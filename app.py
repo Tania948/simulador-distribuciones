@@ -12,21 +12,6 @@ aplicar_estilos_inicio()
 
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
-# Estilos específicos de las pestañas (puedes dejarlos aquí o moverlos también a estilos.py si quieres)
-st.markdown("""
-    <style>
-        /* Rosita */
-        button[data-baseweb="tab"][aria-selected="true"] {
-            color: #FF69B4 !important;
-            border-color: #FF69B4 !important;
-        }
-        /* Hover en pestañas */
-        button[data-baseweb="tab"]:hover {
-            color: #FFB6C1 !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 # Menú lateral
 st.sidebar.header("Tamaño de la muestra")
 st.sidebar.markdown("(Este parámetro afecta a todas las distribuciones)")

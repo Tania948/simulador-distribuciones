@@ -11,6 +11,16 @@ estilos_css = """
     font-size: 18px;
     font-weight: normal;
     line-height: 1.6;
+
+    /* Rosita */
+    button[data-baseweb="tab"][aria-selected="true"] {
+        color: #FF69B4 !important;
+        border-color: #FF69B4 !important;
+    }
+    /* Hover en pestañas */
+    button[data-baseweb="tab"]:hover {
+        color: #FFB6C1 !important;
+    }
 }
 </style>
 """
