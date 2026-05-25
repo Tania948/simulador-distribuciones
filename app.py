@@ -1,16 +1,10 @@
 # app.py
 import streamlit as st
 from subpaginas.inicio import mostrar_inicio
-# Importamos la función que inyecta el CSS general
-from css.estilos import aplicar_estilos_inicio, aplicar_estilos_pestanas
-
-# Configuración de página
-st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
+from css.estilos import importar_estilos
 
 # Inyectamos los estilos CSS globales desde tu archivo de estilos
-aplicar_estilos_inicio()
-aplicar_estilos_pestanas()
-
+importar_estilos()
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
 # Menú lateral

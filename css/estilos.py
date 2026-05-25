@@ -1,6 +1,8 @@
 # css/estilos.py
 import streamlit as st
 
+st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
+
 # Guardamos el CSS en una variable de texto limpio
 estilos_css = """
 <style>
@@ -43,3 +45,8 @@ def parrafo_adaptable(texto):
 def aplicar_estilos_pestanas():
     """Inyecta el CSS específico para las pestañas."""
     st.markdown(pestanas_css, unsafe_allow_html=True)
+
+def importar_estilos():
+    """Función para importar todos los estilos de una vez."""
+    aplicar_estilos_inicio()
+    aplicar_estilos_pestanas()
