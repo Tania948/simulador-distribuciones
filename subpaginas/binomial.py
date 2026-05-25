@@ -1,5 +1,5 @@
 import streamlit as st
-from css.estilos import titulo_rosa
+from css.estilos import titulo_rosa, parrafo_adaptable
 
 def intro_binomial():
     titulo_rosa("Distribución Binomial")
