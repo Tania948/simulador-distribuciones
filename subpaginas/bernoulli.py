@@ -12,101 +12,90 @@ def intro_bernoulli():
     )
 
 def inicializar_bernoulli():
-    # 1. Introducción
     intro_bernoulli()
     st.markdown("---")
     
-    # 2. Sincronización bidireccional para el parámetro 'p' en session_state
+    # 1. CONTROL DE ESTADO (Sincronización perfecta)
     if 'p_bernoulli' not in st.session_state:
-        st.session_state['p_bernoulli'] = 0.5  # Valor inicial por defecto
+        st.session_state['p_bernoulli'] = 0.5
 
-    # Funciones Callback para mantener ambos controles iguales
-    def cambiar_slider():
+    # Funciones que se ejecutan al interactuar con los inputs
+    def actualizar_desde_slider():
         st.session_state['p_bernoulli'] = st.session_state['slider_p']
 
-    def cambiar_numero():
-        # Limitar el valor entre 0 y 1 por seguridad
+    def actualizar_desde_numero():
         val = st.session_state['num_p']
+        # Forzar a que esté en el rango de probabilidad [0.0, 1.0]
         st.session_state['p_bernoulli'] = min(max(val, 0.0), 1.0)
 
-    # 3. SECCIÓN DE PARÁMETROS (ARRIBA)
-    # Centramos un contenedor para que no se vea tan estirado en pantallas gigantes
-    with st.container():
-        col_centro_params = st.columns([1, 4, 1]) # Columnas para centrar el bloque de parámetros
-        with col_centro_params[1]:
-            st.subheader("⚙️ Parámetros de la distribución")
-            
-            parrafo_adaptable("Ajusta la probabilidad de éxito (p). Es más probable que uses la barra:")
-
-            # CONTROL PRINCIPAL: Deslizador (Slider) - Ahora arriba
-            st.slider(
-                "**Selecciona con la barra:**",
-                min_value=0.0, max_value=1.0, step=0.01,
-                key='slider_p', on_change=cambiar_slider,
-                value=st.session_state['p_bernoulli']
-            )
-            
-            # CONTROL SECUNDARIO: Entrada manual (Pequeño cuadradito) - Ahora abajo y discreto
-            # Usamos un contenedor horizontal pequeño para meter el label y el input juntos
-            col_label_discreto, col_input_discreto = st.columns([2, 1])
-            with col_label_discreto:
-                # Usamos st.write en lugar de la etiqueta del input para un control total
-                st.write("**O ingresa p manualmente:**")
-            
-            with col_input_discreto:
-                # El truco es 'label_visibility="collapsed"' para quitar la etiqueta ostentosa
-                st.number_input(
-                    "O ingresa p manualmente (etiqueta colapsada):", # El texto aquí ya no se ve
-                    min_value=0.0, max_value=1.0, step=0.01,
-                    key='num_p', on_change=cambiar_numero,
-                    value=st.session_state['p_bernoulli'],
-                    label_visibility="collapsed" # <-- ESTE ES EL TRUCO
-                )
-
-            # Cálculos teóricos finales
-            p_final = st.session_state['p_bernoulli']
-            q_final = 1.0 - p_final
-            varianza = p_final * q_final
-            
-            # Indicadores Teóricos
-            st.markdown("### 📊 Indicadores Teóricos")
-            col_ind1, col_ind2, col_ind3 = st.columns(3)
-            with col_ind1:
-                st.metric(label="Pr. de Fracaso (q)", value=f"{q_final:.4f}")
-            with col_ind2:
-                # Esperanza = Media = p
-                st.metric(label="Esperanza (E[X] / μ)", value=f"{p_final:.4f}")
-            with col_ind3:
-                st.metric(label="Varianza (σ²)", value=f"{varianza:.4f}")
-
-    st.markdown("---")
+    # 2. DISEÑO EN COLUMNAS (Lado a lado en PC, apilado en celular)
+    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
-    # 4. SECCIÓN DE GRÁFICA (ABAJO)
-    with st.container():
+    with col_izquierda:
+        st.subheader("⚙️ Parámetros de la distribución")
+        parrafo_adaptable("Ajusta la probabilidad de éxito (p):")
+
+        # CONTROL 1: Slider (Usa el valor actual del estado)
+        p_final = st.slider(
+            "Selecciona con la barra:",
+            min_value=0.0, max_value=1.0, step=0.01,
+            key='slider_p',
+            value=st.session_state['p_bernoulli'],
+            on_change=actualizar_desde_slider,
+            label_visibility="collapsed"
+        )
+        
+        # CONTROL 2: Entrada manual discreta (Alineada y limpia)
+        col_txt, col_inp = st.columns([2, 1])
+        with col_txt:
+            st.write("**O ingresa p manualmente:**")
+        with col_inp:
+            st.number_input(
+                "Input numérico discreto",
+                min_value=0.0, max_value=1.0, step=0.01,
+                key='num_p',
+                value=st.session_state['p_bernoulli'],
+                on_change=actualizar_desde_numero,
+                label_visibility="collapsed"
+            )
+
+        # Recalculamos los indicadores usando estrictamente el valor unificado
+        q_final = 1.0 - p_final
+        varianza = p_final * q_final
+        
+        # Indicadores Teóricos en la parte inferior izquierda
+        st.markdown("### 📊 Indicadores Teóricos")
+        col_ind1, col_ind2, col_ind3 = st.columns(3)
+        with col_ind1:
+            st.metric(label="Pr. de Fracaso (q)", value=f"{q_final:.4f}")
+        with col_ind2:
+            st.metric(label="Esperanza (E[X] / μ)", value=f"{p_final:.4f}")
+        with col_ind3:
+            st.metric(label="Varianza (σ²)", value=f"{varianza:.4f}")
+
+    with col_derecha:
         st.subheader("📈 Simulación Visual")
         
-        # Recuperamos el tamaño de muestra global (N) de app.py
+        # Recuperamos el tamaño global N de la muestra
         n_muestra = st.session_state.get('tamano_muestra', 1000)
         
-        # Simulación de datos
+        # Simulación de datos realistas basados en p_final
         datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q_final, p_final])
         exitos = np.sum(datos_simulados == 1)
         fracasos = np.sum(datos_simulados == 0)
         
-        # Construcción de la gráfica
-        fig, ax = plt.subplots(figsize=(6, 4)) # Un tamaño un poco mayor para que se vea bien apilada
+        # Configuración estética de la gráfica de Matplotlib
+        fig, ax = plt.subplots(figsize=(5, 3.5))
         categorias = ['Fracaso (0)', 'Éxito (1)']
         conteos = [fracasos, exitos]
         
-        # Usamos tus colores corporativos (gris oscuro y rosa)
-        ax.bar(categorias, conteos, color=['#31333F', '#FF69B4'], width=0.5)
-        ax.set_ylabel('Frecuencia Absoluta')
-        ax.set_title(f'Resultados de la simulación para N = {n_muestra}')
+        ax.bar(categorias, conteos, color=['#31333F', '#FF69B4'], width=0.45)
+        ax.set_ylabel('Frecuencia Absoluta', fontsize=10)
+        ax.set_title(f'Resultados para N = {n_muestra}', fontsize=11, fontweight='bold')
         
-        # Centrar la gráfica y evitar recortes
-        plt.tight_layout() 
+        # Ajustes de cuadrícula discretos
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
         
-        # Usamos columnas fantasmas para centrar la gráfica en la página
-        col_centro_grafica = st.columns([1, 4, 1])
-        with col_centro_grafica[1]:
-            st.pyplot(fig)
+        plt.tight_layout()
+        st.pyplot(fig)
