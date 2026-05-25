@@ -4,5 +4,9 @@ from css.estilos import titulo_rosa
 def intro_binomial():
     titulo_rosa("Distribución Binomial")
 
+def solicitar_parametros():
+    p = st.number_input("p = ")
+
 def inicializar_binomial():
     intro_binomial()
+    solicitar_parametros
