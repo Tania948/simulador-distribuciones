@@ -61,7 +61,7 @@ def generar_grafica(p, q):
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
 
-    fig, ax = plt.subplots(figsize=(4, 3))
+    fig, ax = plt.subplots(figsize=(8, 3))
 
     categorias = ['Fracaso (0)', 'Éxito (1)']
     conteos = [fracasos, exitos]
@@ -105,38 +105,12 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
 
-    # ============================
-    # CSS RESPONSIVO
-    # ============================
-
     st.markdown("""
     <style>
-
     .main .block-container{
         max-width:1100px;
         margin:auto;
     }
-
-    .tarjeta{
-        background:#f0f2f6;
-        padding:18px;
-        border-radius:12px;
-        text-align:center;
-        margin-bottom:10px;
-    }
-
-    .tarjeta-titulo{
-        color:#666;
-        font-size:14px;
-        font-weight:bold;
-        margin-bottom:8px;
-    }
-
-    .tarjeta-valor{
-        font-size:26px;
-        font-weight:700;
-    }
-
     </style>
     """, unsafe_allow_html=True)
 
@@ -146,9 +120,9 @@ def inicializar_bernoulli():
 
     inicializar_estado()
 
-    # ============================
-    # CONTROLES
-    # ============================
+    # ==========================================
+    # PARÁMETROS
+    # ==========================================
 
     st.subheader("⚙️ Parámetros de la distribución")
 
@@ -184,77 +158,55 @@ def inicializar_bernoulli():
 
     p_final = st.session_state['p_base']
     q_final = 1.0 - p_final
-
     varianza = p_final * q_final
 
     st.markdown("---")
 
-    # ============================
-    # INDICADORES
-    # ============================
+    # ==========================================
+    # RESULTADOS
+    # ==========================================
 
-    st.subheader("📊 Indicadores Teóricos")
+    st.subheader("📊 Resultados")
 
-    col1, col2, col3 = st.columns(3)
+    col_info, col_grafica = st.columns([1, 2])
 
-    with col1:
+    with col_info:
 
-        st.markdown(f"""
-        <div class="tarjeta">
-            <div class="tarjeta-titulo">
-                Pr. Fracaso (q)
-            </div>
+        st.metric(
+            "Prob. Fracaso (q)",
+            f"{q_final:.4f}"
+        )
 
-            <div class="tarjeta-valor"
-                 style="color:#1f77b4;">
-                {q_final:.4f}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric(
+            "Esperanza (μ)",
+            f"{p_final:.4f}"
+        )
 
-    with col2:
+        st.metric(
+            "Varianza (σ²)",
+            f"{varianza:.4f}"
+        )
 
-        st.markdown(f"""
-        <div class="tarjeta">
-            <div class="tarjeta-titulo">
-                Esperanza (μ)
-            </div>
+        st.divider()
 
-            <div class="tarjeta-valor"
-                 style="color:#2ca02c;">
-                {p_final:.4f}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("#### Interpretación")
 
-    with col3:
+        st.write(
+            f"Probabilidad de éxito: **{p_final:.2%}**"
+        )
 
-        st.markdown(f"""
-        <div class="tarjeta">
-            <div class="tarjeta-titulo">
-                Varianza (σ²)
-            </div>
+        st.write(
+            f"Probabilidad de fracaso: **{q_final:.2%}**"
+        )
 
-            <div class="tarjeta-valor"
-                 style="color:#ff7f0e;">
-                {varianza:.4f}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.write(
+            f"Tamaño de muestra: **{st.session_state['tamano_muestra']}**"
+        )
 
-    st.markdown("---")
+    with col_grafica:
 
-    # ============================
-    # GRÁFICA
-    # ============================
+        st.subheader("📈 Simulación Visual")
 
-    st.subheader("📈 Simulación Visual")
-
-    espacio1, centro, espacio2 = st.columns(
-        [1, 8, 1]
-    )
-
-    with centro:
         generar_grafica(
             p_final,
             q_final
