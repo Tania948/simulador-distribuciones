@@ -30,7 +30,7 @@ pestanas_css = """<style>
     }
 
     div[data-baseweb="tab-highlight-bar"] {
-            background-color: #C71585 !important;
+            background-color: #000000 !important;
         }
     
     
