@@ -36,17 +36,10 @@ pestanas_css = """<style>
     button[data-baseweb="tab"]:hover {
         color: #FFB6C1 !important;
     }
-    /*barra movible debajo de las pestañas */
-    div[data-baseweb="tab-list"]::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: #FF69B4;
-        transform: translateX(0);
-        transition: transform 0.3s ease;
+    /*barra de selección*/
+    div[data-baseweb="tab-list"] {
+        border-bottom: 2px solid #FF69B4 !important;
+        color: #FF69B4 !important;
     }
 }
 </style>
