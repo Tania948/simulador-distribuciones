@@ -1,7 +1,7 @@
 # subpaginas/bernoulli.py
 import streamlit as st
 import numpy as np
-import matplotlib.subplots as plots  # Cambiado para evitar conflictos de nombres
+import matplotlib.pyplot as plt  # Corregido: La forma estándar y correcta
 from css.estilos import titulo_rosa, parrafo_adaptable
 
 def intro_bernoulli():
@@ -45,7 +45,6 @@ def renderizar_controles():
             label_visibility="collapsed"
         )
     
-    # Retornamos el valor unificado directo de la memoria
     return st.session_state['p_bernoulli']
 
 def mostrar_indicadores(p, q, varianza):
@@ -71,8 +70,8 @@ def generar_grafica(p, q):
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
     
-    # Construcción del gráfico con Matplotlib
-    fig, ax = plots.subplots(figsize=(5, 3.8))
+    # Construcción del gráfico usando plt estándar
+    fig, ax = plt.subplots(figsize=(5, 3.8))
     categorias = ['Fracaso (0)', 'Éxito (1)']
     conteos = [fracasos, exitos]
     
@@ -83,30 +82,24 @@ def generar_grafica(p, q):
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
-    plots.tight_layout()
+    plt.tight_layout()
     st.pyplot(fig)
+    plt.close(fig) # Limpieza de memoria
 
 def inicializar_bernoulli():
     """Función principal que coordina los módulos de la página."""
-    # 1. Cabecera e inicialización
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 2. Render de estructura de dos columnas de Streamlit
+    # Columnas lado a lado
     col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
     with col_izquierda:
-        # Ejecuta controles y extrae el valor unificado de p
         p_final = renderizar_controles()
-        
-        # Cálculos matemáticos básicos
         q_final = 1.0 - p_final
         varianza = p_final * q_final
-        
-        # Muestra métricas
         mostrar_indicadores(p_final, q_final, varianza)
 
     with col_derecha:
-        # Dibuja la gráfica a la misma altura
         generar_grafica(p_final, q_final)
