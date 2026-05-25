@@ -111,42 +111,59 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
     """
-    Función principal que usa columnas nativas de Streamlit para asegurar la horizontalidad,
-    y un Media Query CSS estricto para forzar el ancho completo (100%) al colapsar en vertical.
+    Función principal que implementa un ordenamiento vertical estricto
+    (Parámetros -> Indicadores -> Gráfica) y ancho completo al achicar la pantalla.
     """
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Ejecución y cálculo de variables (Tu lógica intacta)
+    # 1. Ejecución y cálculo de variables (Lógica intacta)
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. CSS Corregido con esteroides para el colapso vertical
+    # 2. Inyección de CSS responsivo avanzado para corregir el colapso vertical
     st.markdown("""
         <style>
-        /* Cuando la pantalla se achica, forzamos que cada bloque use el 100% del espacio disponible */
+        /* Media Query: Se activa únicamente cuando la pantalla se achica (< 900px) */
         @media (max-width: 900px) {
+            /* 1. Forzamos a las columnas principales a alinearse verticalmente */
             div[data-testid="stHorizontalBlock"] {
                 flex-direction: column !important;
-                gap: 40px !important;
+                gap: 35px !important;
             }
-            /* Eliminamos los anchos calculados por Streamlit y forzamos ancho completo */
+            
+            /* 2. Obligamos a que cada sección principal ocupe el 100% real del ancho disponible */
             div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
                 width: 100% !important;
                 min-width: 100% !important;
                 max-width: 100% !important;
             }
+
+            /* 3. Corrección Crítica: Evita que las micro-columnas internas de las métricas se compriman en "0..." */
+            div[data-testid="stHorizontalBlock"] div[data-testid="column"] div[data-testid="stHorizontalBlock"] {
+                flex-direction: row !important; /* Mantiene las 3 métricas una al lado de la otra */
+                gap: 10px !important;
+            }
+            
+            div[data-testid="stHorizontalBlock"] div[data-testid="column"] div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+                width: 31% !important;
+                min-width: 31% !important;
+                max-width: 31% !important;
+            }
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # 3. Estructura de Columnas Nativas de Streamlit
-    col_izquierda, col_derecha = st.columns([1, 1], gap="large")
+    # 3. Estructura de distribución nativa
+    # En pantallas grandes se mantendrá perfectamente distribuida en dos bloques paralelos
+    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
     with col_izquierda:
+        # Coloca los indicadores teóricos en el contenedor izquierdo
         mostrar_indicadores(p_final, q_final, varianza)
 
     with col_derecha:
+        # Coloca la simulación visual en el contenedor derecho
         generar_grafica(p_final, q_final)
