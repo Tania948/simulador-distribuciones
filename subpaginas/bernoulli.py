@@ -111,8 +111,8 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
     """
-    Función principal adaptativa controlada por Python.
-    Garantiza que nada se rompa en pantallas grandes ni chicas.
+    Función principal definitiva para Bernoulli.
+    Resuelve el truncado en media pantalla y centra estéticamente en celular.
     """
     intro_bernoulli()
     st.markdown("---")
@@ -123,35 +123,72 @@ def inicializar_bernoulli():
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. Selector de vista discreto para el usuario (Salvavidas responsivo)
-    # Lo ponemos en la barra lateral para que no estorbe en el diseño principal
-    with st.sidebar:
-        st.write("📱 **Ajuste de Pantalla**")
-        vista_movil = st.checkbox("Optimizar para Celular / Pantalla Chica", value=False)
+    # 2. CSS Quirúrgico Multi-Dispositivo
+    st.markdown("""
+        <style>
+        /* =================================================================
+           CASO 1: MEDIA PANTALLA / TABLETS (768px a 1100px)
+           Mantiene controles e indicadores a la izquierda, gráfica a la derecha,
+           pero apila las 3 métricas verticalmente para evitar el "0..."
+           ================================================================= */
+        @media (min-width: 768px) and (max-width: 1100px) {
+            /* Buscamos el contenedor interno de las 3 métricas */
+            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                gap: 15px !important;
+            }
+            /* Forzamos a que cada métrica ocupe todo el ancho de su columna */
+            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
 
-    # 3. Renderizado condicional según el tamaño de la pantalla
-    if vista_movil:
-        # --- VISTA VERTICAL (Celulares/Ventanas chicas) ---
-        # Al no usar st.columns, Streamlit le da el 100% de ancho de forma nativa a todo.
-        # El orden estricto se cumple: Parámetros (ya renderizados) -> Indicadores -> Gráfica.
-        
-        st.markdown("### 📊 Indicadores Teóricos")
-        # Renderizamos las métricas una por una hacia abajo con texto completo
-        st.metric(label="Pr. Fracaso (q)", value=f"{q_final:.4f}")
-        st.metric(label="Esperanza (μ)", value=f"{p_final:.4f}")
-        st.metric(label="Varianza (σ²)", value=f"{varianza:.4f}")
-        
-        st.markdown("---")
-        st.markdown("### 📈 Simulación Visual")
+        /* =================================================================
+           CASO 2: CELULARES (Menos de 767px)
+           Todo se va a una sola columna y centramos estéticamente los elementos
+           ================================================================= */
+        @media (max-width: 767px) {
+            /* Forzamos el flujo vertical de los dos bloques madre */
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                gap: 35px !important;
+            }
+            /* Ancho completo para las columnas principales */
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+            }
+            /* Apilamos métricas verticalmente */
+            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                gap: 20px !important;
+            }
+            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+            /* CENTRADO ESTÉTICO: Alineamos textos y valores de las métricas al centro */
+            div[data-testid="stMetric"] {
+                text-align: center !important;
+            }
+            /* Centramos etiquetas y números dentro del componente nativo */
+            div[data-testid="stMetric"] > div {
+                justify-content: center !important;
+                display: flex !important;
+            }
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # 3. Estructura de bloques madre nativos de Streamlit
+    # En pantalla normal (>1100px) e intermedia (768px-1100px) se queda en dos columnas paralelas
+    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
+    
+    with col_izquierda:
+        mostrar_indicadores(p_final, q_final, varianza)
+
+    with col_derecha:
         generar_grafica(p_final, q_final)
-
-    else:
-        # --- VISTA HORIZONTAL ORIGINAL (Computadoras/Pantallas grandes) ---
-        # Tu diseño original que ya sabemos que se ve de 10 en monitores grandes.
-        col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
-        
-        with col_izquierda:
-            mostrar_indicadores(p_final, q_final, varianza)
-
-        with col_derecha:
-            generar_grafica(p_final, q_final)
