@@ -111,84 +111,73 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
     """
-    Función principal definitiva para Bernoulli.
-    Resuelve el truncado en media pantalla y centra estéticamente en celular.
+    Rediseño estructural nativo para Bernoulli.
+    Elimina por completo el uso de CSS forzado y garantiza responsividad 
+    total en cualquier tamaño de pantalla sin romper textos.
     """
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Ejecución y cálculo de variables (Lógica intacta)
-    p_final = renderizar_controles()
-    q_final = 1.0 - p_final
-    varianza = p_final * q_final
-
-    # 2. CSS Quirúrgico Multi-Dispositivo
-    st.markdown("""
-        <style>
-        /* =================================================================
-           CASO 1: MEDIA PANTALLA / TABLETS (768px a 1100px)
-           Mantiene controles e indicadores a la izquierda, gráfica a la derecha,
-           pero apila las 3 métricas verticalmente para evitar el "0..."
-           ================================================================= */
-        @media (min-width: 768px) and (max-width: 1100px) {
-            /* Buscamos el contenedor interno de las 3 métricas */
-            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] {
-                flex-direction: column !important;
-                gap: 15px !important;
-            }
-            /* Forzamos a que cada métrica ocupe todo el ancho de su columna */
-            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 100% !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
-            }
-        }
-
-        /* =================================================================
-           CASO 2: CELULARES (Menos de 767px)
-           Todo se va a una sola columna y centramos estéticamente los elementos
-           ================================================================= */
-        @media (max-width: 767px) {
-            /* Forzamos el flujo vertical de los dos bloques madre */
-            div[data-testid="stHorizontalBlock"] {
-                flex-direction: column !important;
-                gap: 35px !important;
-            }
-            /* Ancho completo para las columnas principales */
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 100% !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
-            }
-            /* Apilamos métricas verticalmente */
-            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] {
-                flex-direction: column !important;
-                gap: 20px !important;
-            }
-            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 100% !important;
-                min-width: 100% !important;
-            }
-            /* CENTRADO ESTÉTICO: Alineamos textos y valores de las métricas al centro */
-            div[data-testid="stMetric"] {
-                text-align: center !important;
-            }
-            /* Centramos etiquetas y números dentro del componente nativo */
-            div[data-testid="stMetric"] > div {
-                justify-content: center !important;
-                display: flex !important;
-            }
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # 3. Estructura de bloques madre nativos de Streamlit
-    # En pantalla normal (>1100px) e intermedia (768px-1100px) se queda en dos columnas paralelas
-    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
+    # ==========================================
+    # 1. BLOQUE DE PARÁMETROS (ANCHO COMPLETO)
+    # ==========================================
+    with st.container():
+        p_final = renderizar_controles()
+        q_final = 1.0 - p_final
+        varianza = p_final * q_final
     
-    with col_izquierda:
-        mostrar_indicadores(p_final, q_final, varianza)
+    st.markdown("##") # Espaciador nativo
 
-    with col_derecha:
+    # ==========================================
+    # 2. BLOQUE DE INDICADORES (TARJETAS NATIVAS)
+    # ==========================================
+    st.subheader("📊 Indicadores Teóricos")
+    
+    # Creamos 3 columnas nativas. En escritorio irán juntas; en celular se apilarán solas.
+    col1, col2, col3 = st.columns(3)
+    
+    # Usamos cajas de texto destacado (st.info/st.success) o contenedores con Markdown
+    # Esto garantiza que el texto se ajuste al ancho disponible y NUNCA muestre "0..."
+    with col1:
+        st.markdown(
+            f"""
+            <div style="background-color: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center;">
+                <span style="color: #555; font-size: 14px; font-weight: bold;">Pr. Fracaso (q)</span><br>
+                <span style="font-size: 24px; font-weight: 700; color: #1f77b4;">{q_final:.4f}</span>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+        
+    with col2:
+        st.markdown(
+            f"""
+            <div style="background-color: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center;">
+                <span style="color: #555; font-size: 14px; font-weight: bold;">Esperanza (μ)</span><br>
+                <span style="font-size: 24px; font-weight: 700; color: #2ca02c;">{p_final:.4f}</span>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+        
+    with col3:
+        st.markdown(
+            f"""
+            <div style="background-color: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center;">
+                <span style="color: #555; font-size: 14px; font-weight: bold;">Varianza (σ²)</span><br>
+                <span style="font-size: 24px; font-weight: 700; color: #ff7f0e;">{varianza:.4f}</span>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+
+    st.markdown("##") # Espaciador nativo
+
+    # ==========================================
+    # 3. BLOQUE DE GRÁFICA (ANCHO COMPLETO ABAJO)
+    # ==========================================
+    st.subheader("📈 Simulación Visual")
+    with st.container():
+        # Al estar abajo ocupando todo el ancho, la gráfica se adaptará perfectamente
         generar_grafica(p_final, q_final)
