@@ -36,7 +36,10 @@ pestanas_css = """<style>
     button[data-baseweb="tab"]:hover {
         color: #FFB6C1 !important;
     }
-    
+    /* Fuerza a que la barra indicadora inferior sea rosa */
+    div[data-baseweb="tab-highlight-bar"] {
+        background-color: #FF69B4 !important;
+    }
 }
 </style>
 """
