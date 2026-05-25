@@ -15,7 +15,7 @@ def modoOscuro():
 
 def textoIntro():
     # 1. El título sigue siendo rosa (se ve bien en fondo claro y oscuro)
-    st.markdown("<h2 style='text-align: center; color: #FF69B4; font-size: 32px;'>Inicio</h2>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: left; color: #FF69B4; font-size: 32px;'>Inicio</h3>", unsafe_allow_html=True)
     
     # 2. Las instrucciones usan la clase CSS 'texto-adaptable' que cambia sola
     st.markdown("<p class='texto-adaptable' style='font-size: 20px; font-weight: normal; line-height: 1.6;'>Seleccione la distribución que desea simular en las pestañas superiores. Ajuste el tamaño de la muestra en la barra lateral para ver cómo afecta a las distribuciones.</p>", unsafe_allow_html=True)
