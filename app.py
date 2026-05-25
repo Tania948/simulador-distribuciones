@@ -1,7 +1,7 @@
 import streamlit as st
 
 #Paginas
-from subpaginas.inicio import mostrar_inicio
+from subpaginas.inicio import inicioMostrar
 
 # Fondo
 st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
