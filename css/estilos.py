@@ -36,11 +36,7 @@ pestanas_css = """<style>
     button[data-baseweb="tab"]:hover {
         color: #FFB6C1 !important;
     }
-    /*barra de selección*/
-    div[data-baseweb="tab-list"] {
-        border-bottom: 2px solid #FF69B4 !important;
-        color: #FF69B4 !important;
-    }
+    
 }
 </style>
 """
