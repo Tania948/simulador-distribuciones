@@ -103,70 +103,65 @@ def inicializar_bernoulli():
     st.markdown("---")
 
     # ==========================================
-    # SECCIÓN 2: RESULTADOS Y SIMULACIÓN (Doble Columna Estricta)
+    # SECCIÓN 2: RESULTADOS Y SIMULACIÓN
     # ==========================================
-    col_info, col_grafica = st.columns([1.1, 1.9], gap="large")
+    st.subheader("📊 Resultados de la Simulación")
 
-    # Generamos la gráfica y los datos una sola vez para usarlos en ambas columnas
+    # Fila superior: Indicadores y Gráfica en dos columnas limpias
+    col_izq_sup, col_der_sup = st.columns([1.1, 1.9], gap="large")
     figura, datos_raw = generar_grafica(p_final, q_final, n_muestra)
 
-    with col_info:
-        st.subheader("📊 Métricas Teóricas")
-        
+    with col_izq_sup:
+        st.write("### 📐 Indicadores Teóricos")
         st.metric("Prob. Fracaso (q)", f"{q_final:.4f}")
         st.metric("Esperanza (μ)", f"{p_final:.4f}")
         st.metric("Varianza (σ²)", f"{varianza:.4f}")
 
-        st.divider()
+    with col_der_sup:
+        st.write("### 📈 Simulación Visual")
+        st.pyplot(figura, use_container_width=True)
 
-        st.subheader("📋 Interpretación")
-        st.write(f"Probabilidad de éxito: **{p_final:.2%}**")
-        st.write(f"Probabilidad de fracaso: **{q_final:.2%}**")
-        st.write(f"Tamaño de muestra activo: **{n_muestra:,}**")
-        
-        st.markdown("##") # Espaciador sutil
+    st.markdown("##") # Pequeño espaciador sutil para separar las filas
+    st.divider()
 
-        # --- BOTÓN: VER FÓRMULAS ---
+    # Fila inferior: Interpretación (Izquierda) y Herramientas/Descargas (Derecha)
+    col_izq_inf, col_der_inf = st.columns([1.3, 1.7], gap="large")
+
+    with col_izq_inf:
+        st.write("### 📋 Interpretación")
+        st.write(f"Probabilidad de éxito ($p$): **{p_final:.2%}**")
+        st.write(f"Probabilidad de fracaso ($q$): **{q_final:.2%}**")
+        st.write(f"Tamaño de muestra activo ($N$): **{n_muestra:,}**")
+
+    with col_der_inf:
+        st.write("### 🛠️ Herramientas y Reportes")
+
+        # Fórmulas teóricas compactas
         with st.expander("📐 Ver Fórmulas Teóricas"):
-            st.latex(r"p + q = 1")
-            st.latex(r"\text{Esperanza: } \mu = p")
-            st.latex(r"\text{Varianza: } \sigma^2 = p \cdot q")
-            st.latex(r"P(X = x) = p^x (1-p)^{1-x}")
+            st.latex(r"p + q = 1 \quad \lhd \quad \mu = p")
+            st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad P(X = x) = p^x q^{1-x}")
 
-        # --- BOTÓN: DESCARGAR CSV (Datos Simulados) ---
+        # Preparación de datos para la descarga de CSV
         df_descarga = pd.DataFrame(datos_raw, columns=["Resultado_Simulacion"])
         csv_data = df_descarga.to_csv(index=True, index_label="Iteracion")
         
-        st.download_button(
-            label="📥 Descargar Simulación (CSV)",
-            data=csv_data,
-            file_name=f"simulacion_bernoulli_p_{p_final:.2f}.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-
-        # --- BOTÓN: DESCARGAR REPORTE (PDF/Estructura limpia) ---
-        # Al no poder compilar reportlab de un segundo a otro de forma segura en la nube, 
-        # generamos un markdown imprimible/guardable impecable como alternativa rápida para la entrega.
-        reporte_texto = f"""# Reporte de Simulación Estadística - Bernoulli
+        col_btn1, col_btn2 = st.columns(2)
         
-Probabilidad de Éxito (p): {p_final:.4f}
-Probabilidad de Fracaso (q): {q_final:.4f}
-Esperanza Matemática (mu): {p_final:.4f}
-Varianza Teórica (sigma^2): {varianza:.4f}
-Tamaño de la Muestra Simulada (N): {n_muestra}
+        with col_btn1:
+            st.download_button(
+                label="📥 Descargar CSV",
+                data=csv_data,
+                file_name=f"simulacion_bernoulli_{p_final:.2f}.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
 
-Muestra generada exitosamente. Documento de control de laboratorio.
-        """
-        st.download_button(
-            label="📄 Descargar Resumen Reporte (TXT)",
-            data=reporte_texto,
-            file_name=f"reporte_bernoulli_{p_final:.2f}.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
-
-    with col_grafica:
-        st.subheader("📈 Simulación Visual")
-        # Forzamos a que use el contenedor para que no se desfase en el layout
-        st.pyplot(figura, use_container_width=True)
+        with col_btn2:
+            reporte_texto = f"Reporte Bernoulli\np: {p_final:.4f}\nq: {q_final:.4f}\nmu: {p_final:.4f}\nsigma2: {varianza:.4f}\nN: {n_muestra}"
+            st.download_button(
+                label="📄 Descargar PDF (TXT)",
+                data=reporte_texto,
+                file_name=f"reporte_bernoulli_{p_final:.2f}.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
