@@ -50,7 +50,7 @@ def mostrar_grafica_y_metricas(p, q, n_muestra):
     # Mostrar la gráfica en Streamlit
     st.pyplot(fig)
 
-def mostrar_bernoulli():
+def inicializar_bernoulli():
     # Mandamos a llamar la introducción
     intro_bernoulli()
     
