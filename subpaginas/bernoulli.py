@@ -111,43 +111,42 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
     """
-    Función principal que implementa un ordenamiento vertical estricto
-    (Parámetros -> Indicadores -> Gráfica) y ancho completo al achicar la pantalla.
+    Función principal corregida. Controla el colapso vertical estricto 
+    únicamente en los dos bloques madre sin alterar los indicadores internos.
     """
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Ejecución y cálculo de variables (Lógica intacta)
+    # 1. Ejecución y cálculo de variables (Tu lógica intacta)
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. Inyección de CSS responsivo avanzado para corregir el colapso vertical
+    # 2. CSS de precisión quirúrgica usando selectores de hijo directo ( > )
     st.markdown("""
         <style>
-        /* Media Query: Se activa únicamente cuando la pantalla se achica (< 900px) */
+        /* Media Query: Se activa únicamente cuando la pantalla mide menos de 900px */
         @media (max-width: 900px) {
-            /* 1. Forzamos a las columnas principales a alinearse verticalmente */
+            /* Solo colapsamos el bloque contenedor principal */
             div[data-testid="stHorizontalBlock"] {
                 flex-direction: column !important;
-                gap: 35px !important;
+                gap: 40px !important;
             }
             
-            /* 2. Obligamos a que cada sección principal ocupe el 100% real del ancho disponible */
-            div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+            # /* Forzamos el 100% de ancho SOLO a las dos columnas madre */
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
                 width: 100% !important;
                 min-width: 100% !important;
                 max-width: 100% !important;
             }
-
-            /* 3. Corrección Crítica: Evita que las micro-columnas internas de las métricas se compriman en "0..." */
-            div[data-testid="stHorizontalBlock"] div[data-testid="column"] div[data-testid="stHorizontalBlock"] {
-                flex-direction: row !important; /* Mantiene las 3 métricas una al lado de la otra */
-                gap: 10px !important;
+            
+            /* RESPETAR MÉTRICAS: Evitamos que las subcolumnas de st.metric se rompan */
+            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] {
+                flex-direction: row !important; /* Mantiene Pr. Fracaso, Esperanza y Varianza en fila */
             }
             
-            div[data-testid="stHorizontalBlock"] div[data-testid="column"] div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
                 width: 31% !important;
                 min-width: 31% !important;
                 max-width: 31% !important;
@@ -156,14 +155,18 @@ def inicializar_bernoulli():
         </style>
     """, unsafe_allow_html=True)
 
-    # 3. Estructura de distribución nativa
-    # En pantallas grandes se mantendrá perfectamente distribuida en dos bloques paralelos
+    # 3. Contenedor de distribución nativa de Streamlit
     col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
     with col_izquierda:
-        # Coloca los indicadores teóricos en el contenedor izquierdo
-        mostrar_indicadores(p_final, q_final, varianza)
+        # Renderiza arriba: Parámetros y abajo de ellos los Indicadores Teóricos
+        mostrar_indicators_layout(p_final, q_final, varianza)
 
     with col_derecha:
-        # Coloca la simulación visual en el contenedor derecho
+        # Renderiza a la derecha en grande, o abajo de todo en pantallas chicas
         generar_grafica(p_final, q_final)
+
+
+def mostrar_indicators_layout(p_final, q_final, varianza):
+    """Función de soporte para encapsular y asegurar el bloque de métricas."""
+    mostrar_indicadores(p_final, q_final, varianza)
