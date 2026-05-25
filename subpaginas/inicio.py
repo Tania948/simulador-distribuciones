@@ -1,9 +1,9 @@
 import streamlit as st
 
-from css.estilos import estilos
+from css.estilos import generales
 
 def modoOscuro():
-    st.markdown(estilos, unsafe_allow_html=True)
+    st.markdown(generales, unsafe_allow_html=True)
 
 def textoIntro():
     st.markdown("<h2 style='text-align: center; color: #FF69B4; font-size: 32px;'>Inicio</h2>", unsafe_allow_html=True)
