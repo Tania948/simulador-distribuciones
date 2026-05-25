@@ -3,6 +3,7 @@ import streamlit as st
 from subpaginas.inicio import mostrar_inicio
 from subpaginas.bernoulli import inicializar_bernoulli
 from subpaginas.geometrica import inicializar_geometrica
+from subpaginas.binomial import inicializar_binomial
 from css.estilos import importar_estilos
 
 
@@ -30,5 +31,8 @@ with pestanas[1]:
     inicializar_bernoulli()
 
 with pestanas[2]:
+    inicializar_binomial()
+
+with pestanas[3]:
     inicializar_geometrica()
 
