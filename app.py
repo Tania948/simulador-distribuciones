@@ -4,6 +4,8 @@ from subpaginas.inicio import mostrar_inicio
 from subpaginas.bernoulli import inicializar_bernoulli
 from subpaginas.geometrica import inicializar_geometrica
 from subpaginas.binomial import inicializar_binomial
+from subpaginas.hipergeometrica import inicializar_hipergeometrica
+from subpaginas.poisson import inicializar_poisson
 from css.estilos import importar_estilos
 
 
@@ -36,3 +38,8 @@ with pestanas[2]:
 with pestanas[3]:
     inicializar_geometrica()
 
+with pestanas[4]:
+    inicializar_hipergeometrica()
+
+with pestanas[5]:
+    inicializar_poisson()
