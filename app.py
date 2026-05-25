@@ -1,5 +1,7 @@
 import streamlit as st
 
+from subpaginas.inicio import mostrar_inicio
+
 # Fondo
 st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
 st.title("Simulador de Distribuciones - Probabilidad y estadistica")
