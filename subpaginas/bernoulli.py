@@ -110,63 +110,45 @@ def generar_grafica(p, q):
     plt.close(fig)
 
 def inicializar_bernoulli():
-    """Función principal con Grid/Flexbox responsivo estricto para mantener la estructura horizontal."""
+    """
+    Función principal que usa columnas nativas de Streamlit para asegurar la horizontalidad,
+    y un Media Query CSS estricto para forzar el colapso vertical en pantallas chicas.
+    """
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Ejecución y cálculo de variables (Lógica intacta)
+    # 1. Ejecución y cálculo de variables (Tu lógica intacta)
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. CSS con Media Query real basado en el ancho de pantalla
+    # 2. CSS CORRECTO: Modifica el comportamiento responsivo nativo de Streamlit
+    # Forzamos a que las columnas de Streamlit se vuelvan bloques completos (100%) en pantallas chicas
     st.markdown("""
         <style>
-        .contenedor-main {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: flex-start;
-            width: 100%;
-            gap: 4%;
-        }
-        .bloque-teorico {
-            width: 56%;
-        }
-        .bloque-grafico {
-            width: 40%;
-        }
-        
-        /* Media Query: Si la pantalla es menor a 900px, colapsa verticalmente */
+        /* Cuando la pantalla sea menor a 900px, rompemos la estructura horizontal */
         @media (max-width: 900px) {
-            .contenedor-main {
-                flex-direction: column;
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                gap: 30px !important;
             }
-            .bloque-teorico {
-                width: 100%;
-            }
-            .bloque-grafico {
-                width: 100%;
-                margin-top: 20px;
+            div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+                width: 100% !important;
+                max-width: 100% !important;
             }
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # 3. Renderizado de la estructura
-    # Contenedor padre flex
-    st.markdown('<div class="contenedor-main">', unsafe_allow_html=True)
+    # 3. Estructura de Columnas Nativas de Streamlit
+    # Al ser nativas, en pantallas grandes se mantendrán alineadas de forma perfecta e inquebrantable
+    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
-    # --- COLUMNA IZQUIERDA (Indicadores Teóricos) ---
-    st.markdown('<div class="bloque-teorico">', unsafe_allow_html=True)
-    mostrar_indicadores(p_final, q_final, varianza)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # --- COLUMNA DERECHA (Gráfica de Matplotlib) ---
-    st.markdown('<div class="bloque-grafico">', unsafe_allow_html=True)
-    generar_grafica(p_final, q_final)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Cerramos el contenedor padre
-    st.markdown('</div>', unsafe_allow_html=True)
+    with col_izquierda:
+        # Aquí se colocan controles e indicadores a la izquierda
+        mostrar_indicadores(p_final, q_final, varianza)
+
+    with col_derecha:
+        # Aquí se coloca la gráfica a la derecha
+        generar_grafica(p_final, q_final)
