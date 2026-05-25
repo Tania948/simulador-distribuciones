@@ -1,6 +1,5 @@
 # subpaginas/bernoulli.py
 import streamlit as st
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from css.estilos import titulo_rosa, parrafo_adaptable
@@ -9,60 +8,78 @@ def intro_bernoulli():
     titulo_rosa("Distribución de Bernoulli")
     parrafo_adaptable(
         "Un experimento de Bernoulli es un proceso estadístico con dos posibles resultados: "
-        "<strong>Éxito</strong> (1) o <strong>Fracaso</strong> (0). Es la base para distribuciones más complejas "
-        "como la Binomial."
+        "<strong>Éxito</strong> (1) o <strong>Fracaso</strong> (0)."
     )
 
-def mostrar_grafica_y_metricas(p, q, n_muestra):
-    # 1. Cálculos teóricos básicos
-    media = p
-    varianza = p * q
-    
-    # Mostrar métricas en tarjetas bonitas lado a lado
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(label="Probabilidad de Fracaso (q)", value=f"{q:.4f}")
-    with col2:
-        st.metric(label="Media (μ)", value=f"{media:.4f}")
-    with col3:
-        st.metric(label="Varianza (σ²)", value=f"{varianza:.4f}")
-        
-    st.markdown("---")
-    
-    # 2. Simulación con el tamaño de muestra de la barra lateral
-    # Generamos los datos simulados (0s y 1s) basados en la probabilidad p
-    datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
-    
-    # Contamos cuántos éxitos y fracasos hubo en la simulación
-    exitos = np.sum(datos_simulados == 1)
-    fracasos = np.sum(datos_simulados == 0)
-    
-    # Crear gráfica de barras con Matplotlib (o Plotly/Altair si prefieren)
-    fig, ax = plt.subplots(figsize=(6, 4))
-    categorias = ['Fracaso (0)', 'Éxito (1)']
-    conteos = [fracasos, exitos]
-    
-    # Diseñamos las barras con tu color rosa de identidad
-    ax.bar(categorias, conteos, color=['#31333F', '#FF69B4'], width=0.5)
-    ax.set_ylabel('Frecuencia Absoluta')
-    ax.set_title(f'Simulación de Bernoulli con N = {n_muestra}')
-    
-    # Mostrar la gráfica en Streamlit
-    st.pyplot(fig)
-
-def inicializar_bernoulli():
-    # Mandamos a llamar la introducción
+def mostrar_bernoulli():
     intro_bernoulli()
-    
     st.markdown("---")
     
-    # Solicitar parámetros de forma segura
-    st.subheader("⚙️ Parámetros de la distribución")
-    p = st.slider("**Selecciona la probabilidad de éxito (p):**", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
-    q = 1.0 - p
+    # 1. Sincronización bidireccional para el parámetro 'p'
+    if 'p_bernoulli' not in st.session_state:
+        st.session_state['p_bernoulli'] = 0.5
+
+    # Funciones Callback para mantener ambos controles iguales
+    def cambiar_slider():
+        st.session_state['p_bernoulli'] = st.session_state['slider_p']
+
+    def cambiar_numero():
+        # Limitar el valor entre 0 y 1 por seguridad
+        val = st.session_state['num_p']
+        st.session_state['p_bernoulli'] = min(max(val, 0.0), 1.0)
+
+    # 2. CREAR COLUMNAS RESPONSIVAS (Izquierda: Parámetros, Derecha: Gráfica)
+    col_izquierda, col_derecha = st.columns([1, 1])
     
-    # Recuperamos el tamaño de muestra global que guardaste en app.py
-    n_muestra = st.session_state.get('tamano_muestra', 1000)
-    
-    # Mostramos los resultados visuales y matemáticos
-    mostrar_grafica_y_metricas(p, q, n_muestra)
+    with col_izquierda:
+        st.subheader("⚙️ Parámetros")
+        
+        # Entrada manual (Input numérico)
+        p_num = st.number_input(
+            "**Ingresa p manualmente (0.0 a 1.0):**",
+            min_value=0.0, max_value=1.0, step=0.01,
+            key='num_p', on_change=cambiar_numero,
+            value=st.session_state['p_bernoulli']
+        )
+        
+        # Deslizador (Slider)
+        p_slide = st.slider(
+            "**O selecciona con la barra:**",
+            min_value=0.0, max_value=1.0, step=0.01,
+            key='slider_p', on_change=cambiar_slider,
+            value=st.session_state['p_bernoulli']
+        )
+        
+        # El valor final que usaremos para los cálculos
+        p_final = st.session_state['p_bernoulli']
+        q_final = 1.0 - p_final
+        varianza = p_final * q_final
+        
+        st.markdown("### 📊 Indicadores Teóricos")
+        st.write(f"**Probabilidad de Fracaso ($q$):** {q_final:.4f}")
+        st.write(f"**Esperanza Matemática ($E[X]$ / $\mu$):** {p_final:.4f}")
+        st.write(f"**Varianza ($\sigma^2$):** {varianza:.4f}")
+
+    with col_derecha:
+        st.subheader("📈 Simulación Visual")
+        
+        # Recuperamos el tamaño de muestra global
+        n_muestra = st.session_state.get('tamano_muestra', 1000)
+        
+        # Simulación de datos
+        datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q_final, p_final])
+        exitos = np.sum(datos_simulados == 1)
+        fracasos = np.sum(datos_simulados == 0)
+        
+        # Construcción de la gráfica
+        fig, ax = plt.subplots(figsize=(5, 3.8))
+        categorias = ['Fracaso (0)', 'Éxito (1)']
+        conteos = [fracasos, exitos]
+        
+        ax.bar(categorias, conteos, color=['#31333F', '#FF69B4'], width=0.4)
+        ax.set_ylabel('Frecuencia Absoluta')
+        ax.set_title(f'Resultados para N = {n_muestra}')
+        
+        # Asegura que las etiquetas no se corten
+        plt.tight_layout() 
+        st.pyplot(fig)
