@@ -1,10 +1,13 @@
+# subpaginas/inicio.py
 import streamlit as st
+# Importamos las herramientas de estilos
+from css.estilos import titulo_rosa, parrafo_adaptable
 
 def mostrar_inicio():
-    # 1. Título principal rosa
-    st.markdown("<h2 style='text-align: center; color: #FF69B4; font-size: 32px;'>Inicio</h2>", unsafe_allow_html=True)
+    # Usamos la función para el título
+    titulo_rosa("Inicio")
     
-    # 2. Instrucciones estilizadas
-    st.markdown("<p style='text-align: center; color: #31333F; font-size: 20px; font-weight: normal; line-height: 1.6;'>Seleccione la distribución que desea simular en las pestañas superiores. Ajuste el tamaño de la muestra en la barra lateral para ver cómo afecta a las distribuciones.</p>", unsafe_allow_html=True)
+    # Usamos la función para los párrafos
+    parrafo_adaptable("Seleccione la distribución que desea simular en las pestañas superiores. Ajuste el tamaño de la muestra en la barra lateral para ver cómo afecta a las distribuciones.")
     
-    st.markdown("<p style='text-align: center; color: #31333F; font-size: 18px; font-weight: normal;'>Seleccione <strong>Guardar</strong> para ver o descargar aquí las simulaciones deseadas.</p>", unsafe_allow_html=True)
+    parrafo_adaptable("Seleccione <strong>Guardar</strong> para ver o descargar aquí las simulaciones deseadas.")
