@@ -28,6 +28,11 @@ pestanas_css = """<style>
         color: #FF69B4 !important;
         border-color: #FF69B4 !important;
     }
+
+    div[data-testid="stSlider"] div[data-presentation="tooltip"] {
+        background-color: #FF69B4 !important;
+        color: white !important;
+    }
     
     /* Hover en pestañas */
     button[data-baseweb="tab"]:hover {
