@@ -86,7 +86,7 @@ def generar_grafica(p, q):
     plots.tight_layout()
     st.pyplot(fig)
 
-def mostrar_bernoulli():
+def inicializar_bernoulli():
     """Función principal que coordina los módulos de la página."""
     # 1. Cabecera e inicialización
     intro_bernoulli()
