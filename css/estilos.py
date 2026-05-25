@@ -4,16 +4,26 @@ import streamlit as st
 st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
 
 # Guardamos el CSS en una variable de texto limpio
+# Abre tu css/estilos.py y agrega esto dentro de las comillas triples de tus estilos generales:
+
 estilos_css = """
 <style>
-    .texto-adaptable {
+/* Quitar los márgenes internos extremos que deja Streamlit por defecto */
+.block-container {
+    max-width: 90% !important; /* Cambia esto a 100% si lo quieres pegado a las orillas */
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
+
+.texto-adaptable {
     color: var(--text-color);
     font-family: 'Arial', sans-serif;
     text-align: justify;
     font-size: 18px;
     font-weight: normal;
     line-height: 1.6;
-    }
+}
+</style>
 """
 
 pestanas_css = """<style>
