@@ -3,16 +3,16 @@ import streamlit as st
 def modoOscuro():
     if st.session_state.get("dark_mode", True):
         st.markdown(
-            """
-            <style>
-            body {
-                background-color: #1E1E1E;
-                color: #FFFFFF;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
+            """<style>
+    body { color: #31333F; background-color: #FFFFFF; }
+    .stApp { background-color: #FFFFFF; }
+    .stButton>button { background-color: #FF69B4; color: #FFFFFF; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; }
+    .stButton>button:hover { background-color: #FF1493; }
+    </style>""",
+            unsafe_allow_html=True,
         )
+            
+            
 
 
 def textoIntro():
