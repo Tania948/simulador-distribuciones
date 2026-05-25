@@ -11,7 +11,7 @@ def intro_bernoulli():
         "<strong>Éxito</strong> (1) o <strong>Fracaso</strong> (0). Es la base para distribuciones más complejas."
     )
 
-def mostrar_bernoulli():
+def inicializar_bernoulli():
     intro_bernoulli()
     st.markdown("---")
     
