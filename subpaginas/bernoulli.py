@@ -111,62 +111,56 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
     """
-    Función principal corregida. Controla el colapso vertical estricto 
-    únicamente en los dos bloques madre sin alterar los indicadores internos.
+    Función principal definitiva. Resuelve el truncado de datos (0...)
+    forzando bloques limpios de ancho completo al colapsar en pantallas chicas.
     """
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Ejecución y cálculo de variables (Tu lógica intacta)
+    # 1. Ejecución y cálculo de variables (Lógica intacta)
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. CSS de precisión quirúrgica usando selectores de hijo directo ( > )
+    # 2. CSS definitivo para controlar el colapso vertical sin romper los textos
     st.markdown("""
         <style>
         /* Media Query: Se activa únicamente cuando la pantalla mide menos de 900px */
         @media (max-width: 900px) {
-            /* Solo colapsamos el bloque contenedor principal */
+            /* 1. Forzamos el flujo vertical de los dos bloques madre */
             div[data-testid="stHorizontalBlock"] {
                 flex-direction: column !important;
-                gap: 40px !important;
+                gap: 30px !important;
             }
             
-            # /* Forzamos el 100% de ancho SOLO a las dos columnas madre */
+            /* 2. Damos el 100% de ancho a las columnas principales */
             div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
                 width: 100% !important;
                 min-width: 100% !important;
                 max-width: 100% !important;
             }
             
-            /* RESPETAR MÉTRICAS: Evitamos que las subcolumnas de st.metric se rompan */
-            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] {
-                flex-direction: row !important; /* Mantiene Pr. Fracaso, Esperanza y Varianza en fila */
-            }
-            
+            /* 3. SOLUCIÓN CRÍTICA: Forzamos a que las micro-columnas de las métricas 
+               ocupen todo el ancho disponible para que no se corten los números */
             div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 31% !important;
-                min-width: 31% !important;
-                max-width: 31% !important;
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+                display: block !important;
+                margin-bottom: 15px !important;
             }
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # 3. Contenedor de distribución nativa de Streamlit
+    # 3. Estructura de distribución nativa de Streamlit
     col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
     with col_izquierda:
-        # Renderiza arriba: Parámetros y abajo de ellos los Indicadores Teóricos
-        mostrar_indicators_layout(p_final, q_final, varianza)
+        # Aquí se pintan Parámetros e Indicadores Teóricos
+        mostrar_indicadores(p_final, q_final, varianza)
 
     with col_derecha:
-        # Renderiza a la derecha en grande, o abajo de todo en pantallas chicas
+        # Aquí se pinta la Gráfica (quedará abajo de todo en pantallas chicas)
         generar_grafica(p_final, q_final)
-
-
-def mostrar_indicators_layout(p_final, q_final, varianza):
-    """Función de soporte para encapsular y asegurar el bloque de métricas."""
-    mostrar_indicadores(p_final, q_final, varianza)
