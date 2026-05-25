@@ -111,8 +111,8 @@ def generar_grafica(p, q):
 
 def inicializar_bernoulli():
     """
-    Función principal definitiva. Resuelve el truncado de datos (0...)
-    forzando bloques limpios de ancho completo al colapsar en pantallas chicas.
+    Función principal adaptativa controlada por Python.
+    Garantiza que nada se rompa en pantallas grandes ni chicas.
     """
     intro_bernoulli()
     st.markdown("---")
@@ -123,44 +123,35 @@ def inicializar_bernoulli():
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. CSS definitivo para controlar el colapso vertical sin romper los textos
-    st.markdown("""
-        <style>
-        /* Media Query: Se activa únicamente cuando la pantalla mide menos de 900px */
-        @media (max-width: 900px) {
-            /* 1. Forzamos el flujo vertical de los dos bloques madre */
-            div[data-testid="stHorizontalBlock"] {
-                flex-direction: column !important;
-                gap: 30px !important;
-            }
-            
-            /* 2. Damos el 100% de ancho a las columnas principales */
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 100% !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
-            }
-            
-            /* 3. SOLUCIÓN CRÍTICA: Forzamos a que las micro-columnas de las métricas 
-               ocupen todo el ancho disponible para que no se corten los números */
-            div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 100% !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
-                display: block !important;
-                margin-bottom: 15px !important;
-            }
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    # 2. Selector de vista discreto para el usuario (Salvavidas responsivo)
+    # Lo ponemos en la barra lateral para que no estorbe en el diseño principal
+    with st.sidebar:
+        st.write("📱 **Ajuste de Pantalla**")
+        vista_movil = st.checkbox("Optimizar para Celular / Pantalla Chica", value=False)
 
-    # 3. Estructura de distribución nativa de Streamlit
-    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
-    
-    with col_izquierda:
-        # Aquí se pintan Parámetros e Indicadores Teóricos
-        mostrar_indicadores(p_final, q_final, varianza)
-
-    with col_derecha:
-        # Aquí se pinta la Gráfica (quedará abajo de todo en pantallas chicas)
+    # 3. Renderizado condicional según el tamaño de la pantalla
+    if vista_movil:
+        # --- VISTA VERTICAL (Celulares/Ventanas chicas) ---
+        # Al no usar st.columns, Streamlit le da el 100% de ancho de forma nativa a todo.
+        # El orden estricto se cumple: Parámetros (ya renderizados) -> Indicadores -> Gráfica.
+        
+        st.markdown("### 📊 Indicadores Teóricos")
+        # Renderizamos las métricas una por una hacia abajo con texto completo
+        st.metric(label="Pr. Fracaso (q)", value=f"{q_final:.4f}")
+        st.metric(label="Esperanza (μ)", value=f"{p_final:.4f}")
+        st.metric(label="Varianza (σ²)", value=f"{varianza:.4f}")
+        
+        st.markdown("---")
+        st.markdown("### 📈 Simulación Visual")
         generar_grafica(p_final, q_final)
+
+    else:
+        # --- VISTA HORIZONTAL ORIGINAL (Computadoras/Pantallas grandes) ---
+        # Tu diseño original que ya sabemos que se ve de 10 en monitores grandes.
+        col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
+        
+        with col_izquierda:
+            mostrar_indicadores(p_final, q_final, varianza)
+
+        with col_derecha:
+            generar_grafica(p_final, q_final)
