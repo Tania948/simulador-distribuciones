@@ -1,6 +1,7 @@
 # app.py
 import streamlit as st
 from subpaginas.inicio import mostrar_inicio
+from subpaginas.bernoulli import inicializar_bernoulli
 from css.estilos import importar_estilos
 
 # Inyectamos los estilos CSS globales desde tu archivo de estilos
@@ -25,3 +26,6 @@ pestanas = st.tabs([
 
 with pestanas[0]:
     mostrar_inicio()
+
+with pestanas[1]:
+    inicializar_bernoulli()
