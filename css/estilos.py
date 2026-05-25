@@ -1,10 +1,6 @@
-# css/estilos.py
 import streamlit as st
 
 st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
-
-# Guardamos el CSS en una variable de texto limpio
-# Abre tu css/estilos.py y agrega esto dentro de las comillas triples de tus estilos generales:
 
 estilos_css = """
 <style>
