@@ -5,7 +5,7 @@ def intro_binomial():
     titulo_rosa("Distribución Binomial")
 
 def solicitar_parametros():
-    p = st.text.number_input("p = ", min_value=0, max_value=1)
+    st.text_input("p = ")
 
 def inicializar_binomial():
     intro_binomial()
