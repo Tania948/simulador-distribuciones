@@ -5,7 +5,7 @@ def intro_binomial():
     titulo_rosa("Distribución Binomial")
 
 def solicitar_parametros():
-    st.text("sdfr")
+    st.text_input("sdfr")
 
 def inicializar_binomial():
     intro_binomial()
