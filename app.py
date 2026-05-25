@@ -2,8 +2,9 @@
 import streamlit as st
 from subpaginas.inicio import mostrar_inicio
 from subpaginas.bernoulli import inicializar_bernoulli
-from css.estilos import importar_estilos
 from subpaginas.geometrica import inicializar_geometrica
+from css.estilos import importar_estilos
+
 
 importar_estilos()
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
@@ -28,13 +29,6 @@ with pestanas[0]:
 with pestanas[1]:
     inicializar_bernoulli()
 
-with pestanas[2]
+with pestanas[2]:
     inicializar_geometrica()
 
-with pestanas[]
-
-with pestanas[]
-with pestanas[]
-with pestanas[]
-with pestanas[]
-with pestanas[]
