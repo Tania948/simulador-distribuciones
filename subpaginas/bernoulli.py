@@ -103,53 +103,159 @@ def generar_grafica(p, q):
     plt.close(fig)
 
 
-def generar_grafica(p, q):
+def inicializar_bernoulli():
 
-    n_muestra = st.session_state.get(
-        'tamano_muestra',
-        1000
+    # ============================
+    # CSS RESPONSIVO
+    # ============================
+
+    st.markdown("""
+    <style>
+
+    .main .block-container{
+        max-width:1100px;
+        margin:auto;
+    }
+
+    .tarjeta{
+        background:#f0f2f6;
+        padding:18px;
+        border-radius:12px;
+        text-align:center;
+        margin-bottom:10px;
+    }
+
+    .tarjeta-titulo{
+        color:#666;
+        font-size:14px;
+        font-weight:bold;
+        margin-bottom:8px;
+    }
+
+    .tarjeta-valor{
+        font-size:26px;
+        font-weight:700;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+    intro_bernoulli()
+
+    st.markdown("---")
+
+    inicializar_estado()
+
+    # ============================
+    # CONTROLES
+    # ============================
+
+    st.subheader("⚙️ Parámetros de la distribución")
+
+    parrafo_adaptable(
+        "Ajusta la probabilidad de éxito (p):"
     )
 
-    datos_simulados = np.random.choice(
-        [0, 1],
-        size=n_muestra,
-        p=[q, p]
+    st.slider(
+        "Probabilidad",
+        min_value=0.0,
+        max_value=1.0,
+        step=0.01,
+        key='slider_p',
+        on_change=actualizar_desde_slider,
+        label_visibility="collapsed"
     )
 
-    exitos = np.sum(datos_simulados == 1)
-    fracasos = np.sum(datos_simulados == 0)
+    col_txt, col_inp = st.columns([2, 1])
 
-    fig, ax = plt.subplots(figsize=(8, 3.5))
+    with col_txt:
+        st.write("**O ingresa p manualmente:**")
 
-    categorias = ['Fracaso (0)', 'Éxito (1)']
-    conteos = [fracasos, exitos]
+    with col_inp:
+        st.number_input(
+            "Valor p",
+            min_value=0.0,
+            max_value=1.0,
+            step=0.01,
+            key='input_p',
+            on_change=actualizar_desde_input,
+            label_visibility="collapsed"
+        )
 
-    ax.bar(
-        categorias,
-        conteos,
-        color=['#31333F', '#FF69B4']
+    p_final = st.session_state['p_base']
+    q_final = 1.0 - p_final
+
+    varianza = p_final * q_final
+
+    st.markdown("---")
+
+    # ============================
+    # INDICADORES
+    # ============================
+
+    st.subheader("📊 Indicadores Teóricos")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        st.markdown(f"""
+        <div class="tarjeta">
+            <div class="tarjeta-titulo">
+                Pr. Fracaso (q)
+            </div>
+
+            <div class="tarjeta-valor"
+                 style="color:#1f77b4;">
+                {q_final:.4f}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+
+        st.markdown(f"""
+        <div class="tarjeta">
+            <div class="tarjeta-titulo">
+                Esperanza (μ)
+            </div>
+
+            <div class="tarjeta-valor"
+                 style="color:#2ca02c;">
+                {p_final:.4f}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
+
+        st.markdown(f"""
+        <div class="tarjeta">
+            <div class="tarjeta-titulo">
+                Varianza (σ²)
+            </div>
+
+            <div class="tarjeta-valor"
+                 style="color:#ff7f0e;">
+                {varianza:.4f}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # ============================
+    # GRÁFICA
+    # ============================
+
+    st.subheader("📈 Simulación Visual")
+
+    espacio1, centro, espacio2 = st.columns(
+        [1, 8, 1]
     )
 
-    ax.set_ylabel('Frecuencia')
-
-    ax.set_title(
-        f'Resultados para N = {n_muestra}'
-    )
-
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-
-    ax.grid(
-        axis='y',
-        linestyle='--',
-        alpha=0.3
-    )
-
-    plt.tight_layout()
-
-    st.pyplot(
-        fig,
-        use_container_width=True
-    )
-
-    plt.close(fig)
+    with centro:
+        generar_grafica(
+            p_final,
+            q_final
+        )
