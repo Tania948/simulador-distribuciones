@@ -120,10 +120,16 @@ def inicializar_bernoulli():
     q_final = 1.0 - p_final
     varianza = p_final * q_final
     
-    
-
-    mostrar_indicadores(p_final, q_final, varianza)
-
     st.markdown("---") # Línea sutil de separación
+    
+    # 2. Bloque Inferior Flotante: Indicadores a la izquierda y Gráfica a la derecha
+    # Al usar una proporción simétrica [1, 1], Streamlit gestiona mejor el espacio
+    col_izq, col_der = st.columns([1, 1], gap="large")
+    
+    with col_izq:
+        # Los indicadores teóricos ahora tienen el ancho completo de su sección
+        mostrar_indicadores(p_final, q_final, varianza)
 
-    generar_grafica(p_final, q_final)
+    with col_der:
+        # La simulación visual se renderiza de forma paralela sin aplastarse
+        generar_grafica(p_final, q_final)
