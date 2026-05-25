@@ -110,29 +110,33 @@ def generar_grafica(p, q):
     plt.close(fig)
 
 def inicializar_bernoulli():
-    """Función principal con comportamiento responsivo tipo Media Query mediante Flexbox."""
+    """Función principal con comportamiento responsivo exacto mediante CSS Flexbox."""
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Calculamos los datos primero (Lógica pura)
+    # 1. Ejecución y cálculo de variables madre
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. Maquetación Responsiva con CSS Flexbox
-    # Creamos un contenedor que permite que sus hijos se bajen (wrap) si el espacio mide menos de 450px
+    # 2. Inyección de reglas Flexbox corregidas para pantallas grandes vs chicas
     st.markdown("""
         <style>
         .contenedor-responsivo {
             display: flex;
             flex-wrap: wrap;
-            gap: 40px;
+            gap: 5%;
             width: 100%;
+            align-items: flex-start;
         }
-        .columna-bloque {
-            flex: 1 1 450px; /* Crece si hay espacio, pero si baja de 450px se envuelve abajo */
-            min-width: 300px;
+        .columna-teorica {
+            flex: 1 1 500px; /* Toma el espacio que necesite, mínimo 500px */
+            max-width: 100%;
+        }
+        .columna-grafica {
+            flex: 1 1 400px; /* Base de 400px para la gráfica */
+            max-width: 500px; /* Evita que la gráfica se estire infinitamente en pantallas gigantes */
         }
         </style>
     """, unsafe_allow_html=True)
@@ -141,14 +145,12 @@ def inicializar_bernoulli():
     st.markdown('<div class="contenedor-responsivo">', unsafe_allow_html=True)
     
     # --- COLUMNA IZQUIERDA (Controles e Indicadores) ---
-    st.markdown('<div class="columna-bloque">', unsafe_allow_html=True)
-    # Volvemos a llamar a renderizar_controles pero de forma visual en la columna izquierda
-    # (Como ya se ejecutó arriba, session_state ya está al día, aquí solo se dibuja)
+    st.markdown('<div class="columna-teorica">', unsafe_allow_html=True)
     mostrar_indicadores(p_final, q_final, varianza)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # --- COLUMNA DERECHA (Gráfica) ---
-    st.markdown('<div class="columna-bloque">', unsafe_allow_html=True)
+    st.markdown('<div class="columna-grafica">', unsafe_allow_html=True)
     generar_grafica(p_final, q_final)
     st.markdown('</div>', unsafe_allow_html=True)
     
