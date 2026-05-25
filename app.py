@@ -9,6 +9,7 @@ st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_s
 
 # Inyectamos los estilos CSS globales desde tu archivo de estilos
 aplicar_estilos_inicio()
+aplicar_estilos_pestanas()
 
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
