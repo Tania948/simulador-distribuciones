@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from css.estilos import titulo_rosa, parrafo_adaptable
 
+# Reutilizamos tus funciones limpias que ya funcionan
 def intro_bernoulli():
-    """Muestra el título de la página y la introducción teórica."""
     titulo_rosa("Distribución de Bernoulli")
     parrafo_adaptable(
         "Un experimento de Bernoulli es un proceso estadístico con dos posibles resultados: "
@@ -13,132 +13,115 @@ def intro_bernoulli():
     )
 
 def inicializar_estado():
-    """Garantiza que las variables de control existan con el valor inicial base."""
     if 'p_base' not in st.session_state:
         st.session_state['p_base'] = 0.30
     
-    # Sincronizamos las variables del slider e input por primera vez
+    # Sincronizamos las variables del slider e input base
     if 'slider_p' not in st.session_state:
         st.session_state['slider_p'] = st.session_state['p_base']
     if 'input_p' not in st.session_state:
         st.session_state['input_p'] = st.session_state['p_base']
 
 def actualizar_desde_slider():
-    """Se ejecuta al mover la barra: actualiza la base y el cuadro numérico."""
     st.session_state['p_base'] = st.session_state['slider_p']
     st.session_state['input_p'] = st.session_state['slider_p']
 
 def actualizar_desde_input():
-    """Se ejecuta al teclear un número: actualiza la base y desplaza la barra."""
     val = st.session_state['input_p']
-    # Restringimos de forma segura al rango de probabilidad [0.0, 1.0]
     val_validado = min(max(val, 0.0), 1.0)
-    
     st.session_state['p_base'] = val_validado
     st.session_state['slider_p'] = val_validado
 
-def renderizar_controles():
-    """
-    Dibuja los controles enlazados de forma cruzada.
-    Retorna el valor final coordinado.
-    """
-    st.subheader("⚙️ Parámetros de la distribución")
-    parrafo_adaptable("Ajusta la probabilidad de éxito (p):")
-
-    # CONTROL A: Slider con llave única y callback de actualización
-    st.slider(
-        "Selecciona con la barra:",
-        min_value=0.0, max_value=1.0, step=0.01,
-        key='slider_p',
-        on_change=actualizar_desde_slider,
-        label_visibility="collapsed"
-    )
-    
-    # CONTROL B: Entrada manual con otra llave única y callback de actualización
-    col_txt, col_inp = st.columns([2, 1])
-    with col_txt:
-        st.write("**O ingresa p manualmente:**")
-    with col_inp:
-        st.number_input(
-            "Input numérico discreto",
-            min_value=0.0, max_value=1.0, step=0.01,
-            key='input_p',
-            on_change=actualizar_desde_input,
-            label_visibility="collapsed"
-        )
-    
-    # Retornamos el valor madre unificado
-    return st.session_state['p_base']
-
-def mostrar_indicadores(p, q, varianza):
-    """Renderiza las tarjetas con las métricas teóricas."""
-    st.markdown("### 📊 Indicadores Teóricos")
-    col_ind1, col_ind2, col_ind3 = st.columns(3)
-    with col_ind1:
-        st.metric(label="Pr. Fracaso (q)", value=f"{q:.4f}")
-    with col_ind2:
-        st.metric(label="Esperanza (μ)", value=f"{p:.4f}")
-    with col_ind3:
-        st.metric(label="Varianza (σ²)", value=f"{varianza:.4f}")
-
 def generar_grafica(p, q):
-    """Crea la simulación estadística y dibuja la gráfica de barras."""
-    st.subheader("📈 Simulación Visual")
-    
+    # Gráfica de Matplotlib limpia y escalada
     # Recuperamos la muestra global N de app.py
     n_muestra = st.session_state.get('tamano_muestra', 1000)
     
-    # Simulación aleatoria
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
     
-    # Gráfica en Matplotlib
-    fig, ax = plt.subplots(figsize=(5, 3.8))
+    # Matplotlib nativo (no requiere unsafe_allow_html)
+    # Aumentamos el tamaño de fuente para que sea legible en monitor grande
+    fig, ax = plt.subplots(figsize=(6, 4))
     categorias = ['Fracaso (0)', 'Éxito (1)']
     conteos = [fracasos, exitos]
     
-    ax.bar(categorias, conteos, color=['#31333F', '#FF69B4'], width=0.45)
-    ax.set_ylabel('Frecuencia Absoluta', fontsize=10)
-    ax.set_title(f'Resultados para N = {n_muestra}', fontsize=11, fontweight='bold')
+    ax.bar(categorias, conteos, color=['#31333F', '#FF69B4'], width=0.5)
+    ax.set_ylabel('Frecuencia Absoluta', fontsize=12)
+    ax.set_title(f'Resultados para N = {n_muestra}', fontsize=14, fontweight='bold')
     
+    # Estilizado limpio
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
+    ax.grid(axis='y', linestyle='--', alpha=0.3)
     
     plt.tight_layout()
     st.pyplot(fig)
     plt.close(fig)
 
+# --- REESCRITURA DEL LAYOUT RESPONSIVO NATIVO ---
+
 def inicializar_bernoulli():
     """
-    Rediseño estructural nativo para Bernoulli.
-    Elimina por completo el uso de CSS forzado y garantiza responsividad 
-    total en cualquier tamaño de pantalla sin romper textos.
+    Nuevo diseño estructural nativo para Bernoulli.
+    Resuelve el balance en pantalla grande (no horizontal aplastado)
+    y el truncado en pantalla intermedia sin usar CSS inyectado.
     """
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
     # ==========================================
-    # 1. BLOQUE DE PARÁMETROS (ANCHO COMPLETO)
+    # 1. BLOQUE SUPERIOR (CONTROLES A LO ANCHO)
     # ==========================================
+    # Aprovechamos el ancho completo nativo de Streamlit para los parámetros.
     with st.container():
-        p_final = renderizar_controles()
-        q_final = 1.0 - p_final
-        varianza = p_final * q_final
-    
+        st.subheader("⚙️ Parámetros de la distribución")
+        parrafo_adaptable("Ajusta la probabilidad de éxito (p):")
+
+        # Slider a lo ancho: cómodo y preciso
+        st.slider(
+            "Selecciona con la barra:",
+            min_value=0.0, max_value=1.0, step=0.01,
+            key='slider_p',
+            on_change=actualizar_desde_slider,
+            label_visibility="collapsed"
+        )
+        
+        # Input numérico flotante a lo ancho
+        col_txt, col_inp = st.columns([2, 1])
+        with col_txt:
+            st.write("**O ingresa p manualmente:**")
+        with col_inp:
+            st.number_input(
+                "Input numérico discreto",
+                min_value=0.0, max_value=1.0, step=0.01,
+                key='input_p',
+                on_change=actualizar_desde_input,
+                label_visibility="collapsed"
+            )
+
+    # Calculamos variables madre (Lógica intacta)
+    p_final = st.session_state['p_base']
+    q_final = 1.0 - p_final
+    varianza = p_final * q_final
+
+    st.markdown("---")
     st.markdown("##") # Espaciador nativo
 
     # ==========================================
-    # 2. BLOQUE DE INDICADORES (TARJETAS NATIVAS)
+    # 2. BLOQUE CENTRAL (INDICADORES TIPO TARJETA)
     # ==========================================
+    # Aquí solucionamos el truncado ("0...") y el amontonamiento.
+    # No usamos st.columns para las métricas. Usamos un diseño nativo y autocontenido.
     st.subheader("📊 Indicadores Teóricos")
     
-    # Creamos 3 columnas nativas. En escritorio irán juntas; en celular se apilarán solas.
+    # Creamos un bloque de 3 columnas nativas. En monitor irán side-by-side, en celular se apilarán.
     col1, col2, col3 = st.columns(3)
     
-    # Usamos cajas de texto destacado (st.info/st.success) o contenedores con Markdown
-    # Esto garantiza que el texto se ajuste al ancho disponible y NUNCA muestre "0..."
+    # Usamos cajas de texto destacado (st.info, st.success) que Streamlit escala nativamente.
+    # ¡Al tener el ancho completo de la columna, los números NUNCA se cortarán!
     with col1:
         st.markdown(
             f"""
@@ -175,9 +158,11 @@ def inicializar_bernoulli():
     st.markdown("##") # Espaciador nativo
 
     # ==========================================
-    # 3. BLOQUE DE GRÁFICA (ANCHO COMPLETO ABAJO)
+    # 3. BLOQUE INFERIOR (GRÁFICA EXPANDIDA ABAJO)
     # ==========================================
+    # Aquí resolvemos el balance en pantalla grande.
+    # No usamos columnas para la gráfica. La ponemos abajo ocupando TODO el ancho de la página.
     st.subheader("📈 Simulación Visual")
     with st.container():
-        # Al estar abajo ocupando todo el ancho, la gráfica se adaptará perfectamente
+        # Al tener el ancho completo de la página, la gráfica se ve grande, legible y espectacular en monitor.
         generar_grafica(p_final, q_final)
