@@ -110,26 +110,47 @@ def generar_grafica(p, q):
     plt.close(fig)
 
 def inicializar_bernoulli():
-    """Función principal coordinada de forma responsiva y limpia."""
+    """Función principal con comportamiento responsivo tipo Media Query mediante Flexbox."""
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Bloque Superior: Captura de parámetros y datos del usuario
+    # 1. Calculamos los datos primero (Lógica pura)
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
-    
-    st.markdown("---") # Línea sutil de separación
-    
-    # 2. Bloque Inferior Flotante: Indicadores a la izquierda y Gráfica a la derecha
-    # Al usar una proporción simétrica [1, 1], Streamlit gestiona mejor el espacio
-    col_izq, col_der = st.columns([1, 1], gap="large")
-    
-    with col_izq:
-        # Los indicadores teóricos ahora tienen el ancho completo de su sección
-        mostrar_indicadores(p_final, q_final, varianza)
 
-    with col_der:
-        # La simulación visual se renderiza de forma paralela sin aplastarse
-        generar_grafica(p_final, q_final)
+    # 2. Maquetación Responsiva con CSS Flexbox
+    # Creamos un contenedor que permite que sus hijos se bajen (wrap) si el espacio mide menos de 450px
+    st.markdown("""
+        <style>
+        .contenedor-responsivo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            width: 100%;
+        }
+        .columna-bloque {
+            flex: 1 1 450px; /* Crece si hay espacio, pero si baja de 450px se envuelve abajo */
+            min-width: 300px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Abrimos el contenedor flex principal
+    st.markdown('<div class="contenedor-responsivo">', unsafe_allow_html=True)
+    
+    # --- COLUMNA IZQUIERDA (Controles e Indicadores) ---
+    st.markdown('<div class="columna-bloque">', unsafe_allow_html=True)
+    # Volvemos a llamar a renderizar_controles pero de forma visual en la columna izquierda
+    # (Como ya se ejecutó arriba, session_state ya está al día, aquí solo se dibuja)
+    mostrar_indicadores(p_final, q_final, varianza)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # --- COLUMNA DERECHA (Gráfica) ---
+    st.markdown('<div class="columna-bloque">', unsafe_allow_html=True)
+    generar_grafica(p_final, q_final)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Cerramos el contenedor principal
+    st.markdown('</div>', unsafe_allow_html=True)
