@@ -112,7 +112,7 @@ def generar_grafica(p, q):
 def inicializar_bernoulli():
     """
     Función principal que usa columnas nativas de Streamlit para asegurar la horizontalidad,
-    y un Media Query CSS estricto para forzar el colapso vertical en pantallas chicas.
+    y un Media Query CSS estricto para forzar el ancho completo (100%) al colapsar en vertical.
     """
     intro_bernoulli()
     st.markdown("---")
@@ -123,18 +123,19 @@ def inicializar_bernoulli():
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. CSS CORRECTO: Modifica el comportamiento responsivo nativo de Streamlit
-    # Forzamos a que las columnas de Streamlit se vuelvan bloques completos (100%) en pantallas chicas
+    # 2. CSS Corregido con esteroides para el colapso vertical
     st.markdown("""
         <style>
-        /* Cuando la pantalla sea menor a 900px, rompemos la estructura horizontal */
+        /* Cuando la pantalla se achica, forzamos que cada bloque use el 100% del espacio disponible */
         @media (max-width: 900px) {
             div[data-testid="stHorizontalBlock"] {
                 flex-direction: column !important;
-                gap: 30px !important;
+                gap: 40px !important;
             }
+            /* Eliminamos los anchos calculados por Streamlit y forzamos ancho completo */
             div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
                 width: 100% !important;
+                min-width: 100% !important;
                 max-width: 100% !important;
             }
         }
@@ -142,13 +143,10 @@ def inicializar_bernoulli():
     """, unsafe_allow_html=True)
 
     # 3. Estructura de Columnas Nativas de Streamlit
-    # Al ser nativas, en pantallas grandes se mantendrán alineadas de forma perfecta e inquebrantable
     col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
     with col_izquierda:
-        # Aquí se colocan controles e indicadores a la izquierda
         mostrar_indicadores(p_final, q_final, varianza)
 
     with col_derecha:
-        # Aquí se coloca la gráfica a la derecha
         generar_grafica(p_final, q_final)
