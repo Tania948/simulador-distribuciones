@@ -27,20 +27,21 @@ estilos_css = """
 """
 
 pestanas_css = """<style>
-    /* Rosita */
+    /* Cambia el texto y el borde del botón de la pestaña activa */
     button[data-baseweb="tab"][aria-selected="true"] {
         color: #FF69B4 !important;
         border-color: #FF69B4 !important;
     }
+    
     /* Hover en pestañas */
     button[data-baseweb="tab"]:hover {
         color: #FFB6C1 !important;
     }
+
     /* Fuerza a que la barra indicadora inferior sea rosa */
     div[data-baseweb="tab-highlight-bar"] {
         background-color: #FF69B4 !important;
     }
-}
 </style>
 """
 
