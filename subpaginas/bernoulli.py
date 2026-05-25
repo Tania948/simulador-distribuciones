@@ -1,7 +1,7 @@
 # subpaginas/bernoulli.py
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt  # Corregido: La forma estándar y correcta
+import matplotlib.pyplot as plt
 from css.estilos import titulo_rosa, parrafo_adaptable
 
 def intro_bernoulli():
@@ -13,27 +13,48 @@ def intro_bernoulli():
     )
 
 def inicializar_estado():
-    """Garantiza que la variable central exista en el session_state."""
-    if 'p_bernoulli' not in st.session_state:
-        st.session_state['p_bernoulli'] = 0.30
+    """Garantiza que las variables de control existan con el valor inicial base."""
+    if 'p_base' not in st.session_state:
+        st.session_state['p_base'] = 0.30
+    
+    # Sincronizamos las variables del slider e input por primera vez
+    if 'slider_p' not in st.session_state:
+        st.session_state['slider_p'] = st.session_state['p_base']
+    if 'input_p' not in st.session_state:
+        st.session_state['input_p'] = st.session_state['p_base']
+
+def actualizar_desde_slider():
+    """Se ejecuta al mover la barra: actualiza la base y el cuadro numérico."""
+    st.session_state['p_base'] = st.session_state['slider_p']
+    st.session_state['input_p'] = st.session_state['slider_p']
+
+def actualizar_desde_input():
+    """Se ejecuta al teclear un número: actualiza la base y desplaza la barra."""
+    val = st.session_state['input_p']
+    # Restringimos de forma segura al rango de probabilidad [0.0, 1.0]
+    val_validado = min(max(val, 0.0), 1.0)
+    
+    st.session_state['p_base'] = val_validado
+    st.session_state['slider_p'] = val_validado
 
 def renderizar_controles():
     """
-    Muestra el slider y el input numérico amarrados a la misma llave.
-    Retorna el valor actual de p seleccionado.
+    Dibuja los controles enlazados de forma cruzada.
+    Retorna el valor final coordinado.
     """
     st.subheader("⚙️ Parámetros de la distribución")
     parrafo_adaptable("Ajusta la probabilidad de éxito (p):")
 
-    # CONTROL A: Slider (Comparte la misma key exacta)
+    # CONTROL A: Slider con llave única y callback de actualización
     st.slider(
         "Selecciona con la barra:",
         min_value=0.0, max_value=1.0, step=0.01,
-        key='p_bernoulli',  # <-- LLAVE IDÉNTICA
+        key='slider_p',
+        on_change=actualizar_desde_slider,
         label_visibility="collapsed"
     )
     
-    # CONTROL B: Entrada manual discreta (Comparte la misma key exacta)
+    # CONTROL B: Entrada manual con otra llave única y callback de actualización
     col_txt, col_inp = st.columns([2, 1])
     with col_txt:
         st.write("**O ingresa p manualmente:**")
@@ -41,14 +62,16 @@ def renderizar_controles():
         st.number_input(
             "Input numérico discreto",
             min_value=0.0, max_value=1.0, step=0.01,
-            key='p_bernoulli',  # <-- LLAVE IDÉNTICA
+            key='input_p',
+            on_change=actualizar_desde_input,
             label_visibility="collapsed"
         )
     
-    return st.session_state['p_bernoulli']
+    # Retornamos el valor madre unificado
+    return st.session_state['p_base']
 
 def mostrar_indicadores(p, q, varianza):
-    """Renderiza las tarjetas con las métricas teóricas calculadas."""
+    """Renderiza las tarjetas con las métricas teóricas."""
     st.markdown("### 📊 Indicadores Teóricos")
     col_ind1, col_ind2, col_ind3 = st.columns(3)
     with col_ind1:
@@ -70,7 +93,7 @@ def generar_grafica(p, q):
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
     
-    # Construcción del gráfico usando plt estándar
+    # Gráfica en Matplotlib
     fig, ax = plt.subplots(figsize=(5, 3.8))
     categorias = ['Fracaso (0)', 'Éxito (1)']
     conteos = [fracasos, exitos]
@@ -84,15 +107,15 @@ def generar_grafica(p, q):
     
     plt.tight_layout()
     st.pyplot(fig)
-    plt.close(fig) # Limpieza de memoria
+    plt.close(fig)
 
 def inicializar_bernoulli():
-    """Función principal que coordina los módulos de la página."""
+    """Función principal que coordina de forma modular toda la subpágina."""
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # Columnas lado a lado
+    # Estructura en columnas responsivas
     col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
     
     with col_izquierda:
