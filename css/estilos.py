@@ -57,38 +57,8 @@ def aplicar_estilos_pestanas():
     """Inyecta el CSS específico para las pestañas."""
     st.markdown(pestanas_css, unsafe_allow_html=True)
 
-def aplicar_estilos_rosa_fuerte():
-    """Inyecta el CSS para hacer rosas fuertes las barras de progreso y los indicadores de pestañas."""
-    estilos_fuerte = """
-    <style>
-        /* Fuerza a que la barra indicadora inferior de las pestañas sea rosa fuerte */
-        div[data-baseweb="tab-highlight-bar"] {
-            background-color: #C71585 !important;
-        }
-
-        /* Color del riel de progreso de los sliders */
-        div[data-testid="stSlider"] div[role="slider"] div {
-            background-color: #C71585 !important;
-        }
-
-        /* Color de la manija de arrastre de los sliders */
-        div[data-testid="stSlider"] div[handle-container="true"] > div {
-            background-color: #C71585 !important;
-            border-color: #C71585 !important;
-        }
-
-        /* Color del número flotante (tooltip) de los sliders */
-        div[data-testid="stSlider"] div[data-presentation="tooltip"] {
-            background-color: #C71585 !important;
-            color: white !important;
-        }
-    </style>
-    """
-    st.markdown(estilos_fuerte, unsafe_allow_html=True)
-
 def importar_estilos():
     """Función para importar todos los estilos de una vez."""
     aplicar_estilos_inicio()
     aplicar_estilos_pestanas()
-    aplicar_estilos_rosa_fuerte()
 
