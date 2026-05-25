@@ -110,49 +110,63 @@ def generar_grafica(p, q):
     plt.close(fig)
 
 def inicializar_bernoulli():
-    """Función principal con comportamiento responsivo exacto mediante CSS Flexbox."""
+    """Función principal con Grid/Flexbox responsivo estricto para mantener la estructura horizontal."""
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # 1. Ejecución y cálculo de variables madre
+    # 1. Ejecución y cálculo de variables (Lógica intacta)
     p_final = renderizar_controles()
     q_final = 1.0 - p_final
     varianza = p_final * q_final
 
-    # 2. Inyección de reglas Flexbox corregidas para pantallas grandes vs chicas
+    # 2. CSS con Media Query real basado en el ancho de pantalla
     st.markdown("""
         <style>
-        .contenedor-responsivo {
+        .contenedor-main {
             display: flex;
-            flex-wrap: wrap;
-            gap: 5%;
-            width: 100%;
+            flex-direction: row;
+            justify-content: space-between;
             align-items: flex-start;
+            width: 100%;
+            gap: 4%;
         }
-        .columna-teorica {
-            flex: 1 1 500px; /* Toma el espacio que necesite, mínimo 500px */
-            max-width: 100%;
+        .bloque-teorico {
+            width: 56%;
         }
-        .columna-grafica {
-            flex: 1 1 400px; /* Base de 400px para la gráfica */
-            max-width: 500px; /* Evita que la gráfica se estire infinitamente en pantallas gigantes */
+        .bloque-grafico {
+            width: 40%;
+        }
+        
+        /* Media Query: Si la pantalla es menor a 900px, colapsa verticalmente */
+        @media (max-width: 900px) {
+            .contenedor-main {
+                flex-direction: column;
+            }
+            .bloque-teorico {
+                width: 100%;
+            }
+            .bloque-grafico {
+                width: 100%;
+                margin-top: 20px;
+            }
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Abrimos el contenedor flex principal
-    st.markdown('<div class="contenedor-responsivo">', unsafe_allow_html=True)
+    # 3. Renderizado de la estructura
+    # Contenedor padre flex
+    st.markdown('<div class="contenedor-main">', unsafe_allow_html=True)
     
-    # --- COLUMNA IZQUIERDA (Controles e Indicadores) ---
-    st.markdown('<div class="columna-teorica">', unsafe_allow_html=True)
+    # --- COLUMNA IZQUIERDA (Indicadores Teóricos) ---
+    st.markdown('<div class="bloque-teorico">', unsafe_allow_html=True)
     mostrar_indicadores(p_final, q_final, varianza)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # --- COLUMNA DERECHA (Gráfica) ---
-    st.markdown('<div class="columna-grafica">', unsafe_allow_html=True)
+    # --- COLUMNA DERECHA (Gráfica de Matplotlib) ---
+    st.markdown('<div class="bloque-grafico">', unsafe_allow_html=True)
     generar_grafica(p_final, q_final)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Cerramos el contenedor principal
+    # Cerramos el contenedor padre
     st.markdown('</div>', unsafe_allow_html=True)
