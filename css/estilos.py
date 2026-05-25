@@ -4,14 +4,17 @@ import streamlit as st
 # Guardamos el CSS en una variable de texto limpio
 estilos_css = """
 <style>
-.texto-adaptable {
+    .texto-adaptable {
     color: var(--text-color);
     font-family: 'Arial', sans-serif;
     text-align: justify;
     font-size: 18px;
     font-weight: normal;
     line-height: 1.6;
+    }
+"""
 
+pestanas_css = """<style>
     /* Rosita */
     button[data-baseweb="tab"][aria-selected="true"] {
         color: #FF69B4 !important;
@@ -36,3 +39,7 @@ def titulo_rosa(texto):
 def parrafo_adaptable(texto):
     """Pinta párrafos que respetan el modo oscuro automáticamente."""
     st.markdown(f"<p class='texto-adaptable'>{texto}</p>", unsafe_allow_html=True)
+
+def aplicar_estilos_pestanas():
+    """Inyecta el CSS específico para las pestañas."""
+    st.markdown(pestanas_css, unsafe_allow_html=True)
