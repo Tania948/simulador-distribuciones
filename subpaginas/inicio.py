@@ -1,11 +1,9 @@
 import streamlit as st
-
-# El secreto: El punto antes de 'css' le dice a Python: 
-# "Salte de la carpeta 'subpaginas' y busca la carpeta 'css' en la raíz"
-from ..css.estilos import aplicar_estilos_inicio, titulo_rosa, parrafo_adaptable
+# IMPORTACIÓN CORREGIDA: Ruta directa desde la raíz que entiende Streamlit Cloud
+from css.estilos import aplicar_estilos_inicio, titulo_rosa, parrafo_adaptable
 
 def textoIntro():
-    # Cero HTML aquí. Solo llamadas limpias pasando el texto.
+    # Usamos tus funciones de estilos pasándole solo el texto
     titulo_rosa("Inicio")
     
     parrafo_adaptable(
@@ -18,5 +16,5 @@ def textoIntro():
     )
 
 def inicioMostrar():
-    aplicar_estilos_inicio()  # Prepara los estilos de la página
-    textoIntro()             # Imprime los textos
+    aplicar_estilos_inicio()  # Prepara la tipografía y el modo oscuro
+    textoIntro()             # Muestra tus textos limpios

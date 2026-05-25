@@ -1,13 +1,18 @@
 import streamlit as st
 
-# Enrutador de páginas
+# 1. ENRUTADOR DE PÁGINAS MODULARES
 from subpaginas.inicio import inicioMostrar
 
-# Configuración global
-st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
+# 2. CONFIGURACIÓN GLOBAL DE LA INTERFAZ
+st.set_page_config(
+    page_title="Simulador Estadístico", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
+
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
-# Diseño de las pestañas superiores
+# Diseño rosa exclusivo para las pestañas de navegación
 st.markdown("""
     <style>
         button[data-baseweb="tab"][aria-selected="true"] {
@@ -20,13 +25,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Barra lateral (N global)
+
+# 3. PANEL DE CONTROL (BARRA LATERAL)
 st.sidebar.header("Tamaño de la muestra")
 st.sidebar.markdown("(Este parámetro afecta a todas las distribuciones)")
-tamano_muestra = st.sidebar.number_input("**Ingrese el tamaño de la muestra**", min_value=1, max_value=100000, value=1000)
+
+# CORRECCIÓN: Eliminados los argumentos no válidos que causaban el TypeError
+tamano_muestra = st.sidebar.number_input(
+    "**Ingrese el tamaño de la muestra**", 
+    min_value=1, 
+    max_value=100000, 
+    value=1000
+)
 st.session_state['tamano_muestra'] = tamano_muestra
 
-# Menú de opciones
+
+# 4. MENÚ DE OPCIONES
 pestanas = st.tabs(["Inicio", "Bernoulli", "Binomial", "Geometrica", "Hipergeometrica", "Poisson"])
 
 with pestanas[0]:
