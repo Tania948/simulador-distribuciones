@@ -29,10 +29,10 @@ pestanas_css = """<style>
         border-color: #FF69B4 !important;
     }
 
-    div[data-testid="stSlider"] div[data-presentation="tooltip"] {
-        background-color: #FF69B4 !important;
-        color: white !important;
-    }
+    div[data-baseweb="tab-highlight-bar"] {
+            background-color: #C71585 !important;
+        }
+    
     
     /* Hover en pestañas */
     button[data-baseweb="tab"]:hover {
