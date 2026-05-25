@@ -1,62 +1,36 @@
 import streamlit as st
 
-# 1. ENRUTADOR DE PÁGINAS MODULARES
+# Enrutador de páginas
 from subpaginas.inicio import inicioMostrar
 
-# 2. CONFIGURACIÓN GLOBAL DE LA INTERFAZ
-st.set_page_config(
-    page_title="Simulador Estadístico", 
-    layout="wide", 
-    initial_sidebar_state="expanded"
-)
-
+# Configuración global
+st.set_page_config(page_title="Simulador Estadístico", layout="wide", initial_sidebar_state="expanded")
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
-# Inyección de estilos CSS globales exclusiva para el menú de pestañas
+# Diseño de las pestañas superiores
 st.markdown("""
     <style>
-        /* Pestaña seleccionada (Modo Rosita) */
         button[data-baseweb="tab"][aria-selected="true"] {
             color: #FF69B4 !important;
             border-color: #FF69B4 !important;
         }
-        /* Hover al pasar el mouse por las pestañas */
         button[data-baseweb="tab"]:hover {
             color: #FFB6C1 !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-
-# 3. PANEL DE CONTROL (BARRA LATERAL)
+# Barra lateral (N global)
 st.sidebar.header("Tamaño de la muestra")
 st.sidebar.markdown("(Este parámetro afecta a todas las distribuciones)")
-
-tamano_muestra = st.sidebar.number_input(
-    "**Ingrese el tamaño de la muestra**", 
-    min_value=1, 
-    max_value=100000, 
-    value=1000
-)
+tamano_muestra = st.sidebar.number_input("**Ingrese el tamaño de la muestra**", min_value=1, max_value=100000, value=1000)
 st.session_state['tamano_muestra'] = tamano_muestra
 
+# Menú de opciones
+pestanas = st.tabs(["Inicio", "Bernoulli", "Binomial", "Geometrica", "Hipergeometrica", "Poisson"])
 
-# 4. MENÚ DE OPCIONES (Navegación horizontal)
-pestanas = st.tabs([
-    "Inicio",
-    "Bernoulli", 
-    "Binomial", 
-    "Geometrica", 
-    "Hipergeometrica", 
-    "Poisson"
-])
-
-# Conexión modular con cada pestaña
 with pestanas[0]:
     inicioMostrar()
     
 with pestanas[1]:
-    # Ejemplo de cómo usarías el diseño modular en otra pestaña directo en app.py si quisieras:
-    from css.estilos import titulo_rosa, parrafo_adaptable
-    titulo_rosa("Distribución de Bernoulli")
-    st.info("Próximamente: Aquí mandaremos a llamar mostrar_bernoulli()")
+    st.markdown("<h2 style='text-align: center; color: #FF69B4;'>Distribución de Bernoulli</h2>", unsafe_allow_html=True)
