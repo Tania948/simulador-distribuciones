@@ -110,19 +110,26 @@ def generar_grafica(p, q):
     plt.close(fig)
 
 def inicializar_bernoulli():
-    """Función principal que coordina de forma modular toda la subpágina."""
+    """Función principal coordinada de forma responsiva y limpia."""
     intro_bernoulli()
     st.markdown("---")
     inicializar_estado()
     
-    # Estructura en columnas responsivas
-    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
+    # 1. Bloque Superior: Captura de parámetros y datos del usuario
+    p_final = renderizar_controles()
+    q_final = 1.0 - p_final
+    varianza = p_final * q_final
     
-    with col_izquierda:
-        p_final = renderizar_controles()
-        q_final = 1.0 - p_final
-        varianza = p_final * q_final
+    st.markdown("---") # Línea sutil de separación
+    
+    # 2. Bloque Inferior Flotante: Indicadores a la izquierda y Gráfica a la derecha
+    # Al usar una proporción simétrica [1, 1], Streamlit gestiona mejor el espacio
+    col_izq, col_der = st.columns([1, 1], gap="large")
+    
+    with col_izq:
+        # Los indicadores teóricos ahora tienen el ancho completo de su sección
         mostrar_indicadores(p_final, q_final, varianza)
 
-    with col_derecha:
+    with col_der:
+        # La simulación visual se renderiza de forma paralela sin aplastarse
         generar_grafica(p_final, q_final)
