@@ -38,7 +38,7 @@ pestanas = st.tabs([
 ])
 
 with pestanas[0]:
-   st.open("subpaginas/inicio.py")
+   mostrar_inicio()
     
 with pestanas[1]:
     st.markdown("<h2 style='text-align: center; color: #FF69B4;'>Distribución de Bernoulli</h2>", unsafe_allow_html=True)
