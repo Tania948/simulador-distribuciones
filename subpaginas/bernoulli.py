@@ -143,7 +143,7 @@ def inicializar_bernoulli():
     """, unsafe_allow_html=True)
 
     # 3. Estructura de Columnas Nativas de Streamlit
-    col_izquierda, col_derecha = st.columns([1.2, 1], gap="large")
+    col_izquierda, col_derecha = st.columns([1, 1], gap="large")
     
     with col_izquierda:
         mostrar_indicadores(p_final, q_final, varianza)
