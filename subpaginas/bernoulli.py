@@ -14,41 +14,62 @@ def intro_bernoulli():
     )
 
 def inicializar_estado():
+    # Inicialización para la probabilidad p
     if 'p_base' not in st.session_state:
         st.session_state['p_base'] = 0.30
     if 'slider_p' not in st.session_state:
         st.session_state['slider_p'] = st.session_state['p_base']
     if 'input_p' not in st.session_state:
         st.session_state['input_p'] = st.session_state['p_base']
-    if 'tamano_muestra' not in st.session_state:
-        st.session_state['tamano_muestra'] = 1000
+        
+    # Inicialización para el tamaño de muestra N
+    if 'n_base' not in st.session_state:
+        st.session_state['n_base'] = 1000
+    if 'slider_n' not in st.session_state:
+        st.session_state['slider_n'] = st.session_state['n_base']
+    if 'input_n' not in st.session_state:
+        st.session_state['input_n'] = st.session_state['n_base']
 
-def actualizar_desde_slider():
+def actualizar_p_desde_slider():
     st.session_state['p_base'] = st.session_state['slider_p']
     st.session_state['input_p'] = st.session_state['slider_p']
 
-def actualizar_desde_input():
+def actualizar_p_desde_input():
     valor = st.session_state['input_p']
     valor_validado = min(max(valor, 0.0), 1.0)
     st.session_state['p_base'] = valor_validado
     st.session_state['slider_p'] = valor_validado
 
+def actualizar_n_desde_slider():
+    st.session_state['n_base'] = st.session_state['slider_n']
+    st.session_state['input_n'] = st.session_state['slider_n']
+
+def actualizar_n_desde_input():
+    valor = st.session_state['input_n']
+    valor_validado = min(max(int(valor), 10), 100000)
+    st.session_state['n_base'] = valor_validado
+    st.session_state['slider_n'] = valor_validado
+
 def generar_muestra_datos(p, q, n_muestra):
-    """Genera la muestra simulada y computa las frecuencias."""
+    """Genera la muestra simulada y computa las frecuencias absolutas."""
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
     return datos_simulados, exitos, fracasos
 
 def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica):
-    """Genera la figura de Matplotlib según la vista seleccionada por el usuario."""
+    """Genera la figura de Matplotlib usando únicamente barras paralelas estilo pilita."""
     fig, ax = plt.subplots(figsize=(7, 4.2))
     categorias = ['Fracaso (0)', 'Éxito (1)']
+    
     conteos_simulados = [fracasos, exitos]
     conteos_teoricos = [q * n_muestra, p * n_muestra]
+    
+    x = np.arange(len(categorias))
+    ancho_barra = 0.35
 
     if tipo_grafica == "Muestra Simulada":
-        barras = ax.bar(categorias, conteos_simulados, color=['#31333F', '#FF69B4'], width=0.45, alpha=0.85, label='Simulado')
+        barras = ax.bar(x, conteos_simulados, color=['#31333F', '#FF69B4'], width=0.45, alpha=0.85)
         for barra in barras:
             altura = barra.get_height()
             porcentaje = (altura / n_muestra) * 100
@@ -60,34 +81,41 @@ def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica
         ax.set_ylim(0, max(conteos_simulados) * 1.15)
 
     elif tipo_grafica == "Distribucion Teorica":
-        ax.plot(categorias, conteos_teoricos, color='#FF69B4', marker='o', linewidth=2.5, markersize=8, label='Teorico')
-        for i, v in enumerate(conteos_teoricos):
-            porcentaje = (v / n_muestra) * 100
-            ax.annotate(f'{v:,.1f}\n({porcentaje:.1f}%)',
-                        xy=(categorias[i], v),
-                        xytext=(0, 7), textcoords="offset points",
+        barras = ax.bar(x, conteos_teoricos, color=['#555555', '#E04D98'], width=0.45, alpha=0.85)
+        for barra in barras:
+            altura = barra.get_height()
+            porcentaje = (altura / n_muestra) * 100
+            ax.annotate(f'{altura:,.1f}\n({porcentaje:.1f}%)',
+                        xy=(barra.get_x() + barra.get_width() / 2, altura),
+                        xytext=(0, 3), textcoords="offset points",
                         ha='center', va='bottom', fontsize=9, fontweight='bold')
         ax.set_ylabel('Frecuencia Esperada (Teorica)', fontsize=11)
         ax.set_ylim(0, max(conteos_teoricos) * 1.15)
 
     elif tipo_grafica == "Superponer Ambas":
-        # Barras de la simulación real
-        ax.bar(categorias, conteos_simulados, color='#31333F', width=0.45, alpha=0.4, label='Simulado')
-        # Línea de la tendencia teórica calculada
-        ax.plot(categorias, conteos_teoricos, color='#FF69B4', marker='o', linewidth=2.5, markersize=8, label='Teorico')
+        # Barras en paralelo una al lado de la otra
+        barras_sim = ax.bar(x - ancho_barra/2, conteos_simulados, width=ancho_barra, color='#31333F', alpha=0.85, label='Simulado')
+        barras_teo = ax.bar(x + ancho_barra/2, conteos_teoricos, width=ancho_barra, color='#FF69B4', alpha=0.85, label='Teorico')
         
-        # Etiquetas combinadas breves para no saturar visualmente
-        for i in range(2):
-            ax.annotate(f'Sim: {conteos_simulados[i]:,}\nTeo: {conteos_teoricos[i]:,.0f}',
-                        xy=(categorias[i], max(conteos_simulados[i], conteos_teoricos[i])),
-                        xytext=(0, 8), textcoords="offset points",
-                        ha='center', va='bottom', fontsize=9, fontweight='bold')
+        # Colocar etiquetas en las pilitas de simulación
+        for barra in barras_sim:
+            altura = barra.get_height()
+            ax.annotate(f'{altura:,}', xy=(barra.get_x() + barra.get_width() / 2, altura),
+                        xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=8)
+            
+        # Colocar etiquetas en las pilitas de teoría
+        for barra in barras_teo:
+            altura = barra.get_height()
+            ax.annotate(f'{altura:,.0f}', xy=(barra.get_x() + barra.get_width() / 2, altura),
+                        xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=8)
             
         ax.set_ylabel('Frecuencias Comparadas', fontsize=11)
         ax.set_ylim(0, max(max(conteos_simulados), max(conteos_teoricos)) * 1.2)
         ax.legend(loc='upper center', frameon=False, ncol=2)
 
-    ax.set_title(f'Resultados en Base a Vista Seleccionada (N = {n_muestra})', fontsize=11, fontweight='bold')
+    ax.set_xticks(x)
+    ax.set_xticklabels(categorias)
+    ax.set_title(f'Resultados de la Distribucion (N = {n_muestra})', fontsize=11, fontweight='bold')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.grid(axis='y', linestyle='--', alpha=0.3)
@@ -111,62 +139,73 @@ def inicializar_bernoulli():
     inicializar_estado()
 
     # ==========================================
-    # SECCIÓN 1: PARÁMETROS Y CONTROL SÍNCRONO
+    # SECCIÓN 1: PARÁMETROS DE CONFIGURACIÓN
     # ==========================================
     st.subheader("Parametros de la distribucion")
     
-    col_izq_p, col_der_n = st.columns([1.5, 1.5], gap="large")
+    col_izq_p, col_der_n = st.columns(2, gap="large")
     
     with col_izq_p:
-        parrafo_adaptable("Ajusta la probabilidad de exito (p):")
+        st.write("**Probabilidad de exito (p):**")
         st.slider(
-            "Probabilidad",
+            "Probabilidad slider",
             min_value=0.0, max_value=1.0, step=0.01,
             key='slider_p',
-            on_change=actualizar_desde_slider,
+            on_change=actualizar_p_desde_slider,
             label_visibility="collapsed"
         )
-
-        col_txt, col_inp = st.columns([1.5, 1])
-        with col_txt:
-            st.write("O ingresa p manualmente:")
-        with col_inp:
+        col_txt_p, col_inp_p = st.columns([1.5, 1])
+        with col_txt_p:
+            st.write("O ingresa p manual:")
+        with col_inp_p:
             st.number_input(
-                "Valor p",
+                "Valor p input",
                 min_value=0.0, max_value=1.0, step=0.01,
                 key='input_p',
-                on_change=actualizar_desde_input,
+                on_change=actualizar_p_desde_input,
                 label_visibility="collapsed"
             )
 
     with col_der_n:
-        parrafo_adaptable("Control de la muestra global:")
-        # Input numérico para sincronizar con la variable global compartida en st.session_state
-        n_actual = st.number_input(
-            "Tamaño de muestra global (N)",
+        st.write("**Tamaño de muestra global (N):**")
+        st.slider(
+            "Muestra slider",
             min_value=10, max_value=100000, step=10,
-            key='tamano_muestra'
+            key='slider_n',
+            on_change=actualizar_n_desde_slider,
+            label_visibility="collapsed"
         )
+        col_txt_n, col_inp_n = st.columns([1.5, 1])
+        with col_txt_n:
+            st.write("O ingresa N manual:")
+        with col_inp_n:
+            st.number_input(
+                "Valor N input",
+                min_value=10, max_value=100000, step=10,
+                key='input_n',
+                on_change=actualizar_n_desde_input,
+                label_visibility="collapsed"
+            )
         
-        # Botón para generar tamaño de muestra aleatorio coordinado
         if st.button("Generar datos aleatorios de muestra", use_container_width=True):
             n_aleatorio = int(np.random.randint(100, 10001))
-            st.session_state['tamano_muestra'] = n_aleatorio
+            st.session_state['n_base'] = n_aleatorio
+            st.session_state['slider_n'] = n_aleatorio
+            st.session_state['input_n'] = n_aleatorio
             st.rerun()
 
     p_final = st.session_state['p_base']
     q_final = 1.0 - p_final
     varianza = p_final * q_final
-    n_muestra_final = st.session_state['tamano_muestra']
+    n_muestra_final = st.session_state['n_base']
 
     st.markdown("---")
 
     # ==========================================
-    # SECCIÓN 2: RESULTADOS Y SIMULACIÓN
+    # SECCIÓN 2: SIMULACIÓN Y ENFOQUES VISUALES
     # ==========================================
-    st.subheader("Resultados de la Simulación")
+    st.subheader("Resultados de la Simulacion")
     
-    # Menú de selección dinámico para alternar y trasponer gráficas
     tipo_grafica_seleccionada = st.radio(
         "Selecciona el enfoque visual de la grafica:",
         ["Muestra Simulada", "Distribucion Teorica", "Superponer Ambas"],
@@ -176,10 +215,7 @@ def inicializar_bernoulli():
 
     col_izq_sup, col_der_sup = st.columns([1.1, 1.9], gap="large")
     
-    # Generamos los datos numéricos crudos indispensables
     datos_raw, exitos_sim, fracasos_sim = generar_muestra_datos(p_final, q_final, n_muestra_final)
-    
-    # Mandamos llamar la función para renderizar la gráfica específica elegida por el usuario
     figura = generar_grafica_seleccionada(p_final, q_final, n_muestra_final, exitos_sim, fracasos_sim, tipo_grafica_seleccionada)
 
     p_simulada = exitos_sim / n_muestra_final
@@ -201,7 +237,7 @@ def inicializar_bernoulli():
     st.markdown("##") 
     st.divider()
 
-    # Fila inferior: Interpretación y Tabla comparativa frente a Herramientas
+    # Fila inferior: Métricas y Descarga de reportes
     col_izq_inf, col_der_inf = st.columns([1.3, 1.7], gap="large")
 
     with col_izq_inf:
