@@ -32,7 +32,7 @@ def actualizar_desde_input():
     st.session_state['slider_p'] = valor_validado
 
 def generar_grafica(p, q, n_muestra):
-    """Genera la muestra simulada y retorna la figura de Matplotlib y los datos."""
+    """Genera la muestra simulada y retorna la figura de Matplotlib, los datos y frecuencias."""
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
@@ -51,10 +51,10 @@ def generar_grafica(p, q, n_muestra):
     ax.grid(axis='y', linestyle='--', alpha=0.3)
 
     plt.tight_layout()
-    return fig, datos_simulados
+    return fig, datos_simulados, exitos, fracasos
 
 def inicializar_bernoulli():
-    # Fijamos el contenedor para pantallas de escritorio (Adiós dolores de cabeza)
+    # Fijamos el contenedor para pantallas de escritorio
     st.markdown("""
     <style>
     .main .block-container{
@@ -107,9 +107,13 @@ def inicializar_bernoulli():
     # ==========================================
     st.subheader("📊 Resultados de la Simulación")
 
-    # Fila superior: Indicadores y Gráfica en dos columnas limpias
+    # Fila superior: Indicadores Teóricos y Gráfica
     col_izq_sup, col_der_sup = st.columns([1.1, 1.9], gap="large")
-    figura, datos_raw = generar_grafica(p_final, q_final, n_muestra)
+    figura, datos_raw, exitos_sim, fracasos_sim = generar_grafica(p_final, q_final, n_muestra)
+
+    # Cálculo de frecuencias relativas (Valores calculados de la simulación)
+    p_simulada = exitos_sim / n_muestra
+    q_simulada = fracasos_sim / n_muestra
 
     with col_izq_sup:
         st.write("### 📐 Indicadores Teóricos")
@@ -121,17 +125,27 @@ def inicializar_bernoulli():
         st.write("### 📈 Simulación Visual")
         st.pyplot(figura, use_container_width=True)
 
-    st.markdown("##") # Pequeño espaciador sutil para separar las filas
+    st.markdown("##") 
     st.divider()
 
-    # Fila inferior: Interpretación (Izquierda) y Herramientas/Descargas (Derecha)
+    # Fila inferior: Interpretación y Tabla comparativa (Izquierda) frente a Herramientas/Botones (Derecha)
     col_izq_inf, col_der_inf = st.columns([1.3, 1.7], gap="large")
 
     with col_izq_inf:
-        st.write("### 📋 Interpretación")
+        st.write("### 📋 Interpretación y Comparación")
         st.write(f"Probabilidad de éxito ($p$): **{p_final:.2%}**")
         st.write(f"Probabilidad de fracaso ($q$): **{q_final:.2%}**")
         st.write(f"Tamaño de muestra activo ($N$): **{n_muestra:,}**")
+        
+        st.write("**Tabla Comparativa (Probabilidades):**")
+        # Tabla estructurada como pide el formato para contrastar los resultados de laboratorio
+        datos_tabla = {
+            "Métrica": ["Éxito (p)", "Fracaso (q)"],
+            "Valor Teórico": [f"{p_final:.4f}", f"{q_final:.4f}"],
+            "Valor Simulado": [f"{p_simulada:.4f}", f"{q_simulada:.4f}"]
+        }
+        df_comparativo = pd.DataFrame(datos_tabla)
+        st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
 
     with col_der_inf:
         st.write("### 🛠️ Herramientas y Reportes")
@@ -157,9 +171,22 @@ def inicializar_bernoulli():
             )
 
         with col_btn2:
-            reporte_texto = f"Reporte Bernoulli\np: {p_final:.4f}\nq: {q_final:.4f}\nmu: {p_final:.4f}\nsigma2: {varianza:.4f}\nN: {n_muestra}"
+            reporte_texto = (
+                f"REPORTE DE LABORATORIO - DISTRIBUCIÓN DE BERNOULLI\n"
+                f"--------------------------------------------------\n"
+                f"Probabilidad de Éxito Teórica (p): {p_final:.4f}\n"
+                f"Probabilidad de Fracaso Teórica (q): {q_final:.4f}\n"
+                f"Esperanza Matemática (mu): {p_final:.4f}\n"
+                f"Varianza Teórica (sigma2): {varianza:.4f}\n\n"
+                f"RESULTADOS DE LA SIMULACIÓN (N = {n_muestra})\n"
+                f"--------------------------------------------------\n"
+                f"Frecuencia Absoluta Éxitos: {exitos_sim}\n"
+                f"Frecuencia Absoluta Fracasos: {fracasos_sim}\n"
+                f"Proporción de Éxitos Simulada: {p_simulada:.4f}\n"
+                f"Proporción de Fracasos Simulada: {q_simulada:.4f}"
+            )
             st.download_button(
-                label="📄 Descargar PDF (TXT)",
+                label="📄 Descargar TXT",
                 data=reporte_texto,
                 file_name=f"reporte_bernoulli_{p_final:.2f}.txt",
                 mime="text/plain",
