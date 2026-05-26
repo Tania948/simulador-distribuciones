@@ -12,11 +12,6 @@ from css.estilos import importar_estilos
 importar_estilos()
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
-st.sidebar.header("Tamaño de la muestra")
-st.sidebar.markdown("(Este parámetro afecta a todas las distribuciones)")
-tamano_muestra = st.sidebar.number_input("**Ingrese el tamaño de la muestra**", min_value=1, max_value=100000, value=1000)
-st.session_state['tamano_muestra'] = tamano_muestra
-
 pestanas = st.tabs([
     "Inicio",
     "Bernoulli", 
