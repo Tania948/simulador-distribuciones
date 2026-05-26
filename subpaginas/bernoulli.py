@@ -14,7 +14,6 @@ def intro_bernoulli():
     )
 
 def inicializar_estado():
-    # Inicialización para la probabilidad p
     if 'p_base' not in st.session_state:
         st.session_state['p_base'] = 0.30
     if 'slider_p' not in st.session_state:
@@ -22,7 +21,6 @@ def inicializar_estado():
     if 'input_p' not in st.session_state:
         st.session_state['input_p'] = st.session_state['p_base']
         
-    # Inicialización para el tamaño de muestra N
     if 'n_base' not in st.session_state:
         st.session_state['n_base'] = 1000
     if 'slider_n' not in st.session_state:
@@ -46,19 +44,17 @@ def actualizar_n_desde_slider():
 
 def actualizar_n_desde_input():
     valor = st.session_state['input_n']
-    valor_validado = min(max(int(valor), 10), 100000)
+    valor_validado = min(max(int(valor), 2), 100000)
     st.session_state['n_base'] = valor_validado
     st.session_state['slider_n'] = valor_validado
 
 def generar_muestra_datos(p, q, n_muestra):
-    """Genera la muestra simulada y computa las frecuencias absolutas."""
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
     exitos = np.sum(datos_simulados == 1)
     fracasos = np.sum(datos_simulados == 0)
     return datos_simulados, exitos, fracasos
 
 def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica):
-    """Genera la figura de Matplotlib usando únicamente barras paralelas estilo pilita."""
     fig, ax = plt.subplots(figsize=(7, 4.2))
     categorias = ['Fracaso (0)', 'Éxito (1)']
     
@@ -93,17 +89,14 @@ def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica
         ax.set_ylim(0, max(conteos_teoricos) * 1.15)
 
     elif tipo_grafica == "Superponer Ambas":
-        # Barras en paralelo una al lado de la otra
         barras_sim = ax.bar(x - ancho_barra/2, conteos_simulados, width=ancho_barra, color='#31333F', alpha=0.85, label='Simulado')
         barras_teo = ax.bar(x + ancho_barra/2, conteos_teoricos, width=ancho_barra, color='#FF69B4', alpha=0.85, label='Teorico')
         
-        # Colocar etiquetas en las pilitas de simulación
         for barra in barras_sim:
             altura = barra.get_height()
             ax.annotate(f'{altura:,}', xy=(barra.get_x() + barra.get_width() / 2, altura),
                         xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=8)
             
-        # Colocar etiquetas en las pilitas de teoría
         for barra in barras_teo:
             altura = barra.get_height()
             ax.annotate(f'{altura:,.0f}', xy=(barra.get_x() + barra.get_width() / 2, altura),
@@ -170,7 +163,7 @@ def inicializar_bernoulli():
         st.write("**Tamaño de muestra global (N):**")
         st.slider(
             "Muestra slider",
-            min_value=10, max_value=100000, step=10,
+            min_value=2, max_value=100000, step=1,
             key='slider_n',
             on_change=actualizar_n_desde_slider,
             label_visibility="collapsed"
@@ -181,22 +174,24 @@ def inicializar_bernoulli():
         with col_inp_n:
             st.number_input(
                 "Valor N input",
-                min_value=10, max_value=100000, step=10,
+                min_value=2, max_value=100000, step=1,
                 key='input_n',
                 on_change=actualizar_n_desde_input,
                 label_visibility="collapsed"
             )
         
         if st.button("Generar datos aleatorios de muestra", use_container_width=True):
-            n_aleatorio = int(np.random.randint(100, 10001))
+            n_aleatorio = int(np.random.randint(2, 10001))
             st.session_state['n_base'] = n_aleatorio
             st.session_state['slider_n'] = n_aleatorio
             st.session_state['input_n'] = n_aleatorio
             st.rerun()
 
-    p_final = st.session_state['p_base']
-    q_final = 1.0 - p_final
-    varianza = p_final * q_final
+    p_teorica = st.session_state['p_base']
+    q_teorica = 1.0 - p_teorica
+    media_teorica = p_teorica
+    var_teorica = p_teorica * q_teorica
+    desv_teorica = np.sqrt(var_teorica)
     n_muestra_final = st.session_state['n_base']
 
     st.markdown("---")
@@ -213,22 +208,40 @@ def inicializar_bernoulli():
         horizontal=True
     )
 
-    col_izq_sup, col_der_sup = st.columns([1.1, 1.9], gap="large")
+    col_izq_sup, col_der_sup = st.columns([1.2, 1.8], gap="large")
     
-    datos_raw, exitos_sim, fracasos_sim = generar_muestra_datos(p_final, q_final, n_muestra_final)
-    figura = generar_grafica_seleccionada(p_final, q_final, n_muestra_final, exitos_sim, fracasos_sim, tipo_grafica_seleccionada)
+    datos_raw, exitos_sim, fracasos_sim = generar_muestra_datos(p_teorica, q_teorica, n_muestra_final)
+    figura = generar_grafica_seleccionada(p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, tipo_grafica_seleccionada)
 
-    p_simulada = exitos_sim / n_muestra_final
-    q_simulada = fracasos_sim / n_muestra_final
-
-    dif_p = abs(p_final - p_simulada)
-    dif_q = abs(q_final - q_simulada)
+    # Cálculos empíricos de la simulación real
+    media_simulada = np.mean(datos_raw)
+    var_simulada = np.var(datos_raw, ddof=1) # ddof=1 para varianza muestral insesgada
+    desv_simulada = np.sqrt(var_simulada)
 
     with col_izq_sup:
-        st.write("### Indicadores Teoricos")
-        st.metric("Prob. Fracaso (q)", f"{q_final:.4f}")
-        st.metric("Esperanza (mu)", f"{p_final:.4f}")
-        st.metric("Varianza (sigma2)", f"{varianza:.4f}")
+        if tipo_grafica_seleccionada == "Muestra Simulada":
+            st.write("### Indicadores Simulados")
+            st.metric("Media Muestral (x̄)", f"{media_simulada:.4f}")
+            st.metric("Varianza Muestral (s²)", f"{var_simulada:.4f}")
+            st.metric("Desviación Estándar (s)", f"{desv_simulada:.4f}")
+            
+        elif tipo_grafica_seleccionada == "Distribucion Teorica":
+            st.write("### Indicadores Teoricos")
+            st.metric("Esperanza Matemática (μ)", f"{media_teorica:.4f}")
+            st.metric("Varianza Teórica (σ²)", f"{var_teorica:.4f}")
+            st.metric("Desviación Estándar (σ)", f"{desv_teorica:.4f}")
+            
+        elif tipo_grafica_seleccionada == "Superponer Ambas":
+            st.write("### Indicadores Comparados")
+            col_t, col_s = st.columns(2)
+            with col_t:
+                st.caption("Valores Teóricos")
+                st.metric("μ (Esperanza)", f"{media_teorica:.2f}")
+                st.metric("σ² (Varianza)", f"{var_teorica:.2f}")
+            with col_s:
+                st.caption("Valores Simulados")
+                st.metric("x̄ (Media)", f"{media_simulada:.2f}")
+                st.metric("s² (Varianza)", f"{var_simulada:.2f}")
 
     with col_der_sup:
         st.write("### Simulacion Visual")
@@ -237,21 +250,23 @@ def inicializar_bernoulli():
     st.markdown("##") 
     st.divider()
 
-    # Fila inferior: Métricas y Descarga de reportes
-    col_izq_inf, col_der_inf = st.columns([1.3, 1.7], gap="large")
+    # ==========================================
+    # SECCIÓN 3: TABLA COMPARATIVA REQUERIDA Y REPORTES
+    # ==========================================
+    col_izq_inf, col_der_inf = st.columns([1.4, 1.6], gap="large")
 
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
-        st.write(f"Probabilidad de exito (p): **{p_final:.2%}**")
-        st.write(f"Probabilidad de fracaso (q): **{q_final:.2%}**")
+        st.write(f"Probabilidad de exito (p): **{p_teorica:.2%}**")
+        st.write(f"Probabilidad de fracaso (q): **{q_teorica:.2%}**")
         st.write(f"Tamaño de muestra activo (N): **{n_muestra_final:,}**")
         
-        st.write("**Tabla Comparativa e Historial de Diferencias:**")
+        st.write("**Tabla de Resultados Analizados:**")
         datos_tabla = {
-            "Metrica": ["Exito (p)", "Fracaso (q)"],
-            "Valor Teorico": [f"{p_final:.4f}", f"{q_final:.4f}"],
-            "Valor Simulado": [f"{p_simulada:.4f}", f"{q_simulada:.4f}"],
-            "Diferencia Absoluta": [f"{dif_p:.4f}", f"{dif_q:.4f}"]
+            "Concepto": ["Media", "Varianza", "Desviación estándar", "Tamaño de muestra"],
+            "Valor teórico": [f"{media_teorica:.4f}", f"{var_teorica:.4f}", f"{desv_teorica:.4f}", f"{n_muestra_final}"],
+            "Valor simulado": [f"{media_simulada:.4f}", f"{var_simulada:.4f}", f"{desv_simulada:.4f}", f"{n_muestra_final}"],
+            "Diferencia": [f"{abs(media_teorica - media_simulada):.4f}", f"{abs(var_teorica - var_simulada):.4f}", f"{abs(desv_teorica - desv_simulada):.4f}", "0"]
         }
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
@@ -261,7 +276,7 @@ def inicializar_bernoulli():
 
         with st.expander("Ver Formulas Teoricas"):
             st.latex(r"p + q = 1 \quad \lhd \quad \mu = p")
-            st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad P(X = x) = p^x q^{1-x}")
+            st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad \sigma = \sqrt{p \cdot q}")
 
         df_descarga = pd.DataFrame(datos_raw, columns=["Resultado_Simulacion"])
         csv_data = df_descarga.to_csv(index=True, index_label="Iteracion")
@@ -272,7 +287,7 @@ def inicializar_bernoulli():
             st.download_button(
                 label="Descargar CSV",
                 data=csv_data,
-                file_name=f"simulacion_bernoulli_{p_final:.2f}.csv",
+                file_name=f"simulacion_bernoulli_{p_teorica:.2f}.csv",
                 mime="text/csv",
                 use_container_width=True
             )
@@ -281,21 +296,16 @@ def inicializar_bernoulli():
             reporte_texto = (
                 f"REPORTE DE LABORATORIO - DISTRIBUCION DE BERNOULLI\n"
                 f"--------------------------------------------------\n"
-                f"Probabilidad de Exito Teorica (p): {p_final:.4f}\n"
-                f"Probabilidad de Fracaso Teorica (q): {q_final:.4f}\n"
-                f"Esperanza Matematica (mu): {p_final:.4f}\n"
-                f"Varianza Teorica (sigma2): {varianza:.4f}\n\n"
-                f"RESULTADOS Y DESVIACIONES DE LA SIMULACION (N = {n_muestra_final})\n"
-                f"--------------------------------------------------\n"
-                f"Frecuencia Absoluta Exitos: {exitos_sim}\n"
-                f"Frecuencia Absoluta Fracasos: {fracasos_sim}\n"
-                f"Proporcion de Exitos Simulada: {p_simulada:.4f} (Diferencia: {dif_p:.4f})\n"
-                f"Proporcion de Fracasos Simulada: {q_simulada:.4f} (Diferencia: {dif_q:.4f})"
+                f"Concepto                Valor Teorico   Valor Simulado   Diferencia\n"
+                f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
+                f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
+                f"Desv. Estándar (sigma):  {desv_teorica:.4f}          {desv_simulada:.4f}           {abs(desv_teorica - desv_simulada):.4f}\n"
+                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             0"
             )
             st.download_button(
                 label="Descargar TXT",
                 data=reporte_texto,
-                file_name=f"reporte_bernoulli_{p_final:.2f}.txt",
+                file_name=f"reporte_bernoulli_{p_teorica:.2f}.txt",
                 mime="text/plain",
                 use_container_width=True
             )
