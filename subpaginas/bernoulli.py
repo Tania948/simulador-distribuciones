@@ -239,7 +239,7 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
         
         # Elemento pro: Explicación de convergencia para verse más científico
         if n_muestra_final >= 5000:
-            st.info("💡 **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
+            st.info(" **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
@@ -249,7 +249,7 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
             st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad \sigma = \sqrt{p \cdot q}")
 
         # Elemento pro: Visor interactivo de los datos generados al momento
-        with st.expander("🔬 Inspeccionar Muestra Cruda Generada"):
+        with st.expander("Inspeccionar Muestra Cruda Generada"):
             df_inspeccion = pd.DataFrame({"Valor Obtenido (X)": datos_raw})
             df_inspeccion.index.name = "ID_Experimento"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
