@@ -289,4 +289,4 @@ def inicializar_exponencial():
 
     renderizar_analisis_y_reportes_exponencial(
         lambda_val, N_global, media_sim, var_sim, desv_sim, datos_raw
-    )uih
+    )
