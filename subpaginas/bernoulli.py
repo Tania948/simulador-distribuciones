@@ -287,7 +287,7 @@ def renderizar_teorema_limite_central(p_teorica):
     
     parrafo_adaptable(
         "El TLC dicta que si sumamos o promediamos muchas variables aleatorias independientes (como los éxitos de Bernoulli), "
-        "la distribución de esos promedios **convergerá a una distribución Normal (Campana de Gauss)**, "
+        "la distribución de esos promedios <style='color: #E04D98;'>convergerá a una distribución Normal (Campana de Gauss)</style>, "
         "sin importar que la distribución original sea discreta."
     )
     
