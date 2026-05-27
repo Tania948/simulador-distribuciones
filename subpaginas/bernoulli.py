@@ -345,10 +345,10 @@ def renderizar_teorema_limite_central(p_teorica):
         st.pyplot(fig, use_container_width=True)
     with col_info:
         st.write("### Evidencia de Laboratorio")
-        st.write(f"Al agrupar de **{tam_muestra_tlc} en {tam_muestra_tlc}** tus variables Bernoulli:")
+        st.write(f"Al agrupar de **{tam_muestra_tlc} en {tam_muestra_tlc}** las variables Bernoulli:")
         st.markdown(f"* **Esperanza del Promedio:** {np.mean(promedios_muestrales):.4f} (Teórico: {mu_tlc:.4f})")
         st.markdown(f"* **Error Estándar ($\sigma_x$):** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_tlc:.4f})")
-        st.info("🎯 Mira cómo la línea punteada gris (Teoría Normal) abraza casi perfectamente a tus barras rosas (Datos Simulados). ¡El TLC se cumple!")
+        st.info("Se aprecia como la línea punteada gris (Teoría Normal) abraza casi perfectamente a las barras rosas (Datos Simulados). Por lo tanto, el TLC se cumple: La distribución de los promedios muestrales se aproxima a una campana de Gauss")
 
 def inicializar_bernoulli():
     st.markdown("""
@@ -394,14 +394,8 @@ def inicializar_bernoulli():
     st.markdown("##")    
     st.divider()
 
-    # =========================================================================
-    # 4. RENDERIZADO ANALÍTICO INFERIOR Y REPORTES (UNA SOLA LLAMADA LIMPIA)
-    # =========================================================================
     renderizar_analisis_y_reportes(
         p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_sim, var_sim, desv_sim, datos_raw
     )
 
-    # =========================================================================
-    # 5. DEMOSTRACIÓN DEL TEOREMA DEL LÍMITE CENTRAL
-    # =========================================================================
     renderizar_teorema_limite_central(p_teorica)
