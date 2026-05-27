@@ -306,7 +306,7 @@ def inicializar_bernoulli():
                 f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
                 f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
                 f"Desv. Estándar (sigma):  {desv_teorica:.4f}          {desv_simulada:.4f}           {abs(desv_teorica - desv_simulada):.4f}\n"
-                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             -"
+                f"Tamaño de Muestra (N):   {n_muestra_final}                       
             )
             st.download_button(
                 label="Descargar TXT",
