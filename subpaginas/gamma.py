@@ -236,7 +236,7 @@ def renderizar_analisis_y_reportes_gamma(alpha, beta, N_global, media_sim, var_s
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Efecto Teórico:** Observa cómo al cambiar $\alpha$ a valores grandes, el histograma se vuelve más simétrico y se asemeja paulatinamente a una distribución Normal, cumpliendo con el Teorema Central del Límite.")
+        st.info("**Efecto Teórico:** Observa cómo al cambiar $\\alpha$ a valores grandes, el histograma se vuelve más simétrico y se asemeja paulatinamente a una distribución Normal, cumpliendo con el Teorema Central del Límite.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
