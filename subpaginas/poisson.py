@@ -16,7 +16,6 @@ def intro_poisson():
     )
 
 def inicializar_estado_poisson():
-    # lambda: Tasa promedio de eventos por intervalo
     if 'poisson_lambda' not in st.session_state:
         st.session_state['poisson_lambda'] = 4.0
     if 'slider_poisson_lambda' not in st.session_state:
@@ -24,7 +23,6 @@ def inicializar_estado_poisson():
     if 'input_poisson_lambda' not in st.session_state:
         st.session_state['input_poisson_lambda'] = st.session_state['poisson_lambda']
         
-    # N_global: Número de intervalos independientes simulados
     if 'N_poisson_global_base' not in st.session_state:
         st.session_state['N_poisson_global_base'] = 1000
     if 'slider_N_poisson_global' not in st.session_state:
@@ -32,7 +30,6 @@ def inicializar_estado_poisson():
     if 'input_N_poisson_global' not in st.session_state:
         st.session_state['input_N_poisson_global'] = st.session_state['N_poisson_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_poisson_lambda_desde_slider():
     st.session_state['poisson_lambda'] = st.session_state['slider_poisson_lambda']
     st.session_state['input_poisson_lambda'] = st.session_state['slider_poisson_lambda']
@@ -109,19 +106,16 @@ def renderizar_controles_parametros():
 def generar_grafica_poisson(lam, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Poisson teóricamente no tiene límite superior, recortamos visualmente en el percentil 99.5
     max_visible = int(np.percentile(datos_raw, 99.5))
-    max_visible = max(max_visible, int(lam + 4)) # Asegurar que quepa la joroba de la curva si lambda es pequeña
+    max_visible = max(max_visible, int(lam + 4)) 
     x_valores = np.arange(0, max_visible + 1)
     
-    # Frecuencias simuladas reales
     valores_sim, conteos_sim = np.unique(datos_raw, return_counts=True)
     frecuencias_simuladas = np.zeros(len(x_valores))
     for v, c in zip(valores_sim, conteos_sim):
         if v <= max_visible:
             frecuencias_simuladas[v] = c
 
-    # Frecuencias teóricas usando PMF de SciPy
     frecuencias_teoricas = poisson.pmf(x_valores, lam) * N_global
 
     ancho_barra = 0.35
@@ -159,7 +153,6 @@ def renderizar_bloque_visualizacion_poisson(lam, N_global, datos_raw, tipo_grafi
     var_sim = np.var(datos_raw, ddof=1)
     desv_sim = np.sqrt(var_sim)
     
-    # La teoría dicta que en Poisson: Media = Varianza = Lambda
     media_teo = lam
     var_teo = lam
     desv_teo = np.sqrt(lam)
@@ -217,7 +210,6 @@ def renderizar_analisis_y_reportes_poisson(lam, N_global, media_sim, var_sim, de
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        # Elemento de valor para el reporte científico
         st.info("**Propiedad de Equidistribución:** Una característica única de Poisson es que su media es exactamente igual a su varianza ($\mu = \sigma^2 = \lambda$). Puedes ver que en los datos simulados los valores de x̄ y s² se persiguen muy de cerca.")
 
     with col_der_inf:
@@ -280,14 +272,12 @@ def renderizar_tlc_poisson(lam):
             min_value=2, max_value=100, value=30, step=1, key="tlc_poisson_k"
         )
 
-    # Simulación real del TLC con variables Poisson
     matriz_poisson = np.random.poisson(lam=lam, size=(num_muestras, tam_muestra_tlc))
     promedios_muestrales = np.mean(matriz_poisson, axis=1)
     
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
     
-    # Ecuaciones teóricas de la Normal derivada del TLC
     mu_tlc = lam
     sigma_tlc = np.sqrt(lam) / np.sqrt(tam_muestra_tlc)
     

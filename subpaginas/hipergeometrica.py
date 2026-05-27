@@ -16,7 +16,6 @@ def intro_hipergeometrica():
     )
 
 def inicializar_estado_hipergeometrica():
-    # N_pob: Población Total
     if 'hiper_N_pob' not in st.session_state:
         st.session_state['hiper_N_pob'] = 100
     if 'slider_hiper_N' not in st.session_state:
@@ -24,7 +23,6 @@ def inicializar_estado_hipergeometrica():
     if 'input_hiper_N' not in st.session_state:
         st.session_state['input_hiper_N'] = st.session_state['hiper_N_pob']
         
-    # K: Éxitos en la población
     if 'hiper_K_exitos' not in st.session_state:
         st.session_state['hiper_K_exitos'] = 30
     if 'slider_hiper_K' not in st.session_state:
@@ -32,7 +30,6 @@ def inicializar_estado_hipergeometrica():
     if 'input_hiper_K' not in st.session_state:
         st.session_state['input_hiper_K'] = st.session_state['hiper_K_exitos']
 
-    # n: Tamaño de muestra extraída
     if 'hiper_n_muestra' not in st.session_state:
         st.session_state['hiper_n_muestra'] = 20
     if 'slider_hiper_n' not in st.session_state:
@@ -40,7 +37,6 @@ def inicializar_estado_hipergeometrica():
     if 'input_hiper_n' not in st.session_state:
         st.session_state['input_hiper_n'] = st.session_state['hiper_n_muestra']
 
-    # N_global: Repeticiones de la simulación
     if 'N_hiper_global_base' not in st.session_state:
         st.session_state['N_hiper_global_base'] = 1000
     if 'slider_N_hiper_global' not in st.session_state:
@@ -48,7 +44,6 @@ def inicializar_estado_hipergeometrica():
     if 'input_N_hiper_global' not in st.session_state:
         st.session_state['input_N_hiper_global'] = st.session_state['N_hiper_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_hiper_N_desde_slider():
     st.session_state['hiper_N_pob'] = st.session_state['slider_hiper_N']
     st.session_state['input_hiper_N'] = st.session_state['slider_hiper_N']
@@ -108,7 +103,6 @@ def callback_muestra_aleatoria_hipergeometrica():
     st.session_state['input_N_hiper_global'] = N_global
 
 def generar_muestra_datos_hipergeometrica(N_pob, K_exitos, n_muestra, N_global):
-    # np.random.hypergeometric toma (ngood, nbad, nsample, size)
     ngood = K_exitos
     nbad = N_pob - K_exitos
     datos_simulados = np.random.hypergeometric(ngood=ngood, nbad=nbad, nsample=n_muestra, size=N_global)
@@ -117,7 +111,6 @@ def generar_muestra_datos_hipergeometrica(N_pob, K_exitos, n_muestra, N_global):
 def renderizar_controles_parametros():
     st.subheader("Parámetros de la distribución")
     
-    # Validaciones dinámicas en caliente para evitar que explote SciPy o NumPy
     N_pob_actual = st.session_state['hiper_N_pob']
     
     col1, col2, col3, col4 = st.columns(4, gap="small")
@@ -176,19 +169,16 @@ def renderizar_controles_parametros():
 def generar_grafica_hipergeometrica(N_pob, K_exitos, n_muestra, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # El rango lógico de éxitos va desde max(0, n - (N - K)) hasta min(n, K)
     min_posible = max(0, n_muestra - (N_pob - K_exitos))
     max_posible = min(n_muestra, K_exitos)
     x_valores = np.arange(min_posible, max_posible + 1)
     
-    # Procesar simulación
     valores_sim, conteos_sim = np.unique(datos_raw, return_counts=True)
     frecuencias_simuladas = np.zeros(len(x_valores))
     for v, c in zip(valores_sim, conteos_sim):
         if min_posible <= v <= max_posible:
             frecuencias_simuladas[v - min_posible] = c
 
-    # Procesar SciPy PMF teórico
     frecuencias_teoricas = hypergeom.pmf(x_valores, N_pob, K_exitos, n_muestra) * N_global
 
     ancho_barra = 0.35
@@ -226,10 +216,8 @@ def renderizar_bloque_visualizacion_hipergeometrica(N_pob, K_exitos, n_muestra, 
     var_sim = np.var(datos_raw, ddof=1)
     desv_sim = np.sqrt(var_sim)
     
-    # Ecuaciones analíticas de la Hipergeométrica
     p_equivalente = K_exitos / N_pob
     media_teo = n_muestra * p_equivalente
-    # Factor de corrección por población finita (N - n) / (N - 1)
     factor_correccion = (N_pob - n_muestra) / (N_pob - 1) if N_pob > 1 else 1
     var_teo = n_muestra * p_equivalente * (1.0 - p_equivalente) * factor_correccion
     desv_teo = np.sqrt(var_teo)
@@ -352,7 +340,6 @@ def renderizar_tlc_hipergeometrica(N_pob, K_exitos, n_muestra):
             min_value=2, max_value=100, value=30, step=1, key="tlc_hiper_k"
         )
 
-    # Simulación real del TLC con variables hipergeométricas
     ngood = K_exitos
     nbad = N_pob - K_exitos
     matriz_hiper = np.random.hypergeometric(ngood=ngood, nbad=nbad, nsample=n_muestra, size=(num_muestras, tam_muestra_tlc))
@@ -361,7 +348,6 @@ def renderizar_tlc_hipergeometrica(N_pob, K_exitos, n_muestra):
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
     
-    # Ecuaciones TLC para hipergeométrica
     p_eq = K_exitos / N_pob
     factor_c = (N_pob - n_muestra) / (N_pob - 1) if N_pob > 1 else 1
     mu_tlc = n_muestra * p_eq
@@ -409,7 +395,6 @@ def inicializar_hipergeometrica():
     n_muestra = st.session_state['hiper_n_muestra']
     N_global = st.session_state['N_hiper_global_base']
 
-    # Doble validación en la lógica de control para evitar fallos si el usuario ingresa algo inconsistente manual
     if K_exitos > N_pob: K_exitos = N_pob
     if n_muestra > N_pob: n_muestra = N_pob
 

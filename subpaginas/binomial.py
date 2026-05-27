@@ -1,4 +1,3 @@
-# subpaginas/binomial.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +14,6 @@ def intro_binomial():
     )
 
 def inicializar_estado_binomial():
-    # p: Probabilidad de éxito
     if 'p_binom_base' not in st.session_state:
         st.session_state['p_binom_base'] = 0.50
     if 'slider_binom_p' not in st.session_state:
@@ -23,7 +21,6 @@ def inicializar_estado_binomial():
     if 'input_binom_p' not in st.session_state:
         st.session_state['input_binom_p'] = st.session_state['p_binom_base']
         
-    # n: Número de ensayos por experimento
     if 'n_ensayos_base' not in st.session_state:
         st.session_state['n_ensayos_base'] = 10
     if 'slider_n_ensayos' not in st.session_state:
@@ -31,7 +28,6 @@ def inicializar_estado_binomial():
     if 'input_n_ensayos' not in st.session_state:
         st.session_state['input_n_ensayos'] = st.session_state['n_ensayos_base']
 
-    # N: Tamaño de muestra global (Repeticiones de la simulación)
     if 'N_global_base' not in st.session_state:
         st.session_state['N_global_base'] = 1000
     if 'slider_N_global' not in st.session_state:
@@ -39,7 +35,6 @@ def inicializar_estado_binomial():
     if 'input_N_global' not in st.session_state:
         st.session_state['input_N_global'] = st.session_state['N_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_binom_p_desde_slider():
     st.session_state['p_binom_base'] = st.session_state['slider_binom_p']
     st.session_state['input_binom_p'] = st.session_state['slider_binom_p']

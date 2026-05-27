@@ -14,7 +14,6 @@ def intro_bernoulli():
     )
 
 def inicializar_estado():
-    # p: Probabilidad de éxito
     if 'bernoulli_p' not in st.session_state:
         st.session_state['bernoulli_p'] = 0.30
     if 'slider_p' not in st.session_state:
@@ -22,7 +21,6 @@ def inicializar_estado():
     if 'input_p' not in st.session_state:
         st.session_state['input_p'] = st.session_state['bernoulli_p']
         
-    # N: Tamaño de la muestra global
     if 'N_bernoulli_base' not in st.session_state:
         st.session_state['N_bernoulli_base'] = 1000
     if 'slider_n' not in st.session_state:
@@ -30,7 +28,6 @@ def inicializar_estado():
     if 'input_n' not in st.session_state:
         st.session_state['input_n'] = st.session_state['N_bernoulli_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_p_desde_slider():
     st.session_state['bernoulli_p'] = st.session_state['slider_p']
     st.session_state['input_p'] = st.session_state['slider_p']
@@ -238,7 +235,7 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
         if n_muestra_final >= 5000:
-            st.info("📊 **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
+            st.info(" **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")

@@ -30,7 +30,6 @@ def inicializar_estado_normal():
     if 'input_normal_sigma' not in st.session_state:
         st.session_state['input_normal_sigma'] = st.session_state['normal_sigma']
 
-    # N_global: Cantidad de datos en la muestra
     if 'N_normal_global_base' not in st.session_state:
         st.session_state['N_normal_global_base'] = 1000
     if 'slider_N_normal_global' not in st.session_state:
@@ -38,7 +37,6 @@ def inicializar_estado_normal():
     if 'input_N_normal_global' not in st.session_state:
         st.session_state['input_N_normal_global'] = st.session_state['N_normal_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_normal_mu_desde_slider():
     st.session_state['normal_mu'] = st.session_state['slider_normal_mu']
     st.session_state['input_normal_mu'] = st.session_state['slider_normal_mu']
@@ -134,7 +132,6 @@ def renderizar_controles_parametros():
 def generar_grafica_normal(mu, sigma, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Eje X extendido a 4 desviaciones estándar para apreciar las colas de la campana
     x_eje = np.linspace(mu - 4 * sigma, mu + 4 * sigma, 300)
     pdf_teorica = norm.pdf(x_eje, loc=mu, scale=sigma)
     num_bins = 30
