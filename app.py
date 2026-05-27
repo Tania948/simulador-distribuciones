@@ -7,6 +7,7 @@ from subpaginas.hipergeometrica import inicializar_hipergeometrica
 from subpaginas.poisson import inicializar_poisson
 from subpaginas.uniforme import inicializar_uniforme
 from subpaginas.normal import inicializar_normal
+from subpaginas.exponencial import inicializar_exponencial
 from css.estilos import importar_estilos
 
 
@@ -46,3 +47,6 @@ with pestanas[5]:
 
 with pestanas[6]:
     inicializar_normal()
+
+with pestanas[7]:
+    inicializar_exponencial()
