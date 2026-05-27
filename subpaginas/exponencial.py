@@ -209,7 +209,7 @@ def renderizar_analisis_y_reportes_exponencial(lambda_tasa, N_global, media_sim,
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Propiedad Singular:** En la distribución exponencial ocurre una coincidencia matemática hermosa: la **Media** y la **Desviación Estándar** teóricas son exactamente idénticas ($1/\lambda$). Puedes verificar en tu tabla cómo tus valores experimentales simulan esta igualdad.")
+        st.info("**Propiedad Singular:** La **Media** y la **Desviación Estándar** teóricas son exactamente idénticas ($1/\lambda$). Puedes verificar en tu tabla cómo tus valores experimentales simulan esta igualdad.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
