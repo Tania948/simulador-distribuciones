@@ -28,37 +28,38 @@ def inicializar_estado():
     if 'input_n' not in st.session_state:
         st.session_state['input_n'] = st.session_state['n_base']
 
+# Modifica estas funciones dentro de subpaginas/bernoulli.py
+
 def actualizar_p_desde_slider():
-    st.session_state['p_base'] = st.session_state['slider_p']
+    st.session_state['bernoulli_p'] = st.session_state['slider_p']
     st.session_state['input_p'] = st.session_state['slider_p']
 
 def actualizar_p_desde_input():
-    valor = st.session_state['input_p']
-    valor_validado = min(max(valor, 0.0), 1.0)
-    st.session_state['p_base'] = valor_validado
-    st.session_state['slider_p'] = valor_validado
+    valor = min(max(float(st.session_state['input_p']), 0.0), 1.0)
+    st.session_state['bernoulli_p'] = valor
+    st.session_state['slider_p'] = valor
 
-def actualizar_n_desde_slider():
-    st.session_state['n_base'] = st.session_state['slider_n']
-    st.session_state['input_n'] = st.session_state['slider_n']
+def actualizar_N_desde_slider():
+    st.session_state['N_bernoulli_base'] = st.session_state['slider_N_bernoulli']
+    st.session_state['input_N_bernoulli'] = st.session_state['slider_N_bernoulli']
 
-def actualizar_n_desde_input():
-    valor = st.session_state['input_n']
-    valor_validado = min(max(int(valor), 2), 100000)
-    st.session_state['n_base'] = valor_validado
-    st.session_state['slider_n'] = valor_validado
+def actualizar_N_desde_input():
+    valor = min(max(int(st.session_state['input_N_bernoulli']), 5), 100000)
+    st.session_state['N_bernoulli_base'] = valor
+    st.session_state['slider_N_bernoulli'] = valor
 
-def callback_muestra_aleatoria():
-    """Genera de forma segura los valores aleatorios antes del renderizado."""
-    n_aleatorio = int(np.random.randint(2, 10001))
-    st.session_state['n_base'] = n_aleatorio
-    st.session_state['slider_n'] = n_aleatorio
-    st.session_state['input_n'] = n_aleatorio
+def callback_muestra_aleatoria_bernoulli():
+    p_aleatorio = round(float(np.random.uniform(0.1, 0.9)), 2)
+    N_aleatorio = int(np.random.randint(500, 10000))
     
-    p_aleatorio = round(float(np.random.uniform(0.05, 0.95)), 2)
-    st.session_state['p_base'] = p_aleatorio
+    # Asignamos de forma segura a las variables de control
+    st.session_state['bernoulli_p'] = p_aleatorio
     st.session_state['slider_p'] = p_aleatorio
     st.session_state['input_p'] = p_aleatorio
+
+    st.session_state['N_bernoulli_base'] = N_aleatorio
+    st.session_state['slider_N_bernoulli'] = N_aleatorio
+    st.session_state['input_N_bernoulli'] = N_aleatorio
 
 def generar_muestra_datos(p, q, n_muestra):
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
