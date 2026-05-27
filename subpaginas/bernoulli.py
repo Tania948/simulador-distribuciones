@@ -391,16 +391,17 @@ def inicializar_bernoulli():
     st.markdown("##") 
     st.divider()
 
-    # 4. Renderizado Analítico Inferior y Reportes
-    renderizar_analisis_y_reportes(
-        p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_sim, var_sim, desv_sim, datos_raw
-    )
-    # ... (todo tu código anterior de la sección 4 permanece igual)
-    
-    # 4. Renderizado Analítico Inferior y Reportes
+    st.markdown("##")    
+    st.divider()
+
+    # =========================================================================
+    # 4. RENDERIZADO ANALÍTICO INFERIOR Y REPORTES (UNA SOLA LLAMADA LIMPIA)
+    # =========================================================================
     renderizar_analisis_y_reportes(
         p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_sim, var_sim, desv_sim, datos_raw
     )
 
-    # ¡NUEVA LÍNEA COMPLEMENTARIA AQUÍ!
+    # =========================================================================
+    # 5. DEMOSTRACIÓN DEL TEOREMA DEL LÍMITE CENTRAL
+    # =========================================================================
     renderizar_teorema_limite_central(p_teorica)
