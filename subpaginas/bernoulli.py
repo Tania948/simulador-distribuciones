@@ -49,14 +49,16 @@ def actualizar_n_desde_input():
     st.session_state['slider_n'] = valor_validado
 
 def callback_muestra_aleatoria():
-    """Genera de forma segura el valor aleatorio antes del renderizado de los widgets."""
+    """Genera de forma segura los valores aleatorios antes del renderizado."""
     n_aleatorio = int(np.random.randint(2, 10001))
     st.session_state['n_base'] = n_aleatorio
     st.session_state['slider_n'] = n_aleatorio
     st.session_state['input_n'] = n_aleatorio
-    st.session_state['p_base'] = round(np.random.uniform(0.0, 1.0), 2)
-    st.session_state['slider_p'] = st.session_state['p_base']
-    st.session_state['input_p'] = st.session_state['p_base']
+    
+    p_aleatorio = round(float(np.random.uniform(0.05, 0.95)), 2)
+    st.session_state['p_base'] = p_aleatorio
+    st.session_state['slider_p'] = p_aleatorio
+    st.session_state['input_p'] = p_aleatorio
 
 def generar_muestra_datos(p, q, n_muestra):
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
@@ -64,10 +66,50 @@ def generar_muestra_datos(p, q, n_muestra):
     fracasos = np.sum(datos_simulados == 0)
     return datos_simulados, exitos, fracasos
 
+def renderizar_controles_parametros():
+    """Renderiza la sección de configuración de p y N de manera simétrica."""
+    st.subheader("Parametros de la distribucion")
+    col_izq_p, col_der_n = st.columns(2, gap="large")
+    
+    with col_izq_p:
+        st.write("**Probabilidad de exito (p):**")
+        st.slider(
+            "Probabilidad slider", min_value=0.0, max_value=1.0, step=0.01,
+            key='slider_p', on_change=actualizar_p_desde_slider, label_visibility="collapsed"
+        )
+        col_txt_p, col_inp_p = st.columns([1.5, 1])
+        with col_txt_p:
+            st.write("O ingresa p manual:")
+        with col_inp_p:
+            st.number_input(
+                "Valor p input", min_value=0.0, max_value=1.0, step=0.01,
+                key='input_p', on_change=actualizar_p_desde_input, label_visibility="collapsed"
+            )
+
+    with col_der_n:
+        st.write("**Tamaño de muestra global (N):**")
+        st.slider(
+            "Muestra slider", min_value=2, max_value=100000, step=1,
+            key='slider_n', on_change=actualizar_n_desde_slider, label_visibility="collapsed"
+        )
+        col_txt_n, col_inp_n = st.columns([1.5, 1])
+        with col_txt_n:
+            st.write("O ingresa N manual:")
+        with col_inp_n:
+            st.number_input(
+                "Valor N input", min_value=2, max_value=100000, step=1,
+                key='input_n', on_change=actualizar_n_desde_input, label_visibility="collapsed"
+            )
+        
+        st.button(
+            "Generar datos aleatorios de muestra", 
+            use_container_width=True, 
+            on_click=callback_muestra_aleatoria
+        )
+
 def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     categorias = ['Fracaso (0)', 'Éxito (1)']
-    
     conteos_simulados = [fracasos, exitos]
     conteos_teoricos = [q * n_muestra, p * n_muestra]
     
@@ -126,6 +168,118 @@ def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica
     plt.tight_layout()
     return fig
 
+def renderizar_bloque_visualizacion(p_teorica, q_teorica, n_muestra_final, datos_raw, exitos_sim, fracasos_sim, tipo_grafica):
+    """Muestra las métricas dinámicas superiores y el gráfico correspondiente."""
+    st.subheader("Resultados de la Simulacion")
+    
+    col_izq_sup, col_der_sup = st.columns([1.2, 1.8], gap="large")
+    figura = generar_grafica_seleccionada(p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, tipo_grafica)
+
+    media_simulada = np.mean(datos_raw)
+    var_simulada = np.var(datos_raw, ddof=1)
+    desv_simulada = np.sqrt(var_simulada)
+
+    with col_izq_sup:
+        if tipo_grafica == "Muestra Simulada":
+            st.write("### Indicadores Simulados")
+            st.metric("Media Muestral (x̄)", f"{media_simulada:.4f}")
+            st.metric("Varianza Muestral (s²)", f"{var_simulada:.4f}")
+            st.metric("Desviación Estándar (s)", f"{desv_simulada:.4f}")
+            
+        elif tipo_grafica == "Distribucion Teorica":
+            st.write("### Indicadores Teoricos")
+            st.metric("Esperanza Matemática (μ)", f"{p_teorica:.4f}")
+            st.metric("Varianza Teórica (σ²)", f"{p_teorica * q_teorica:.4f}")
+            st.metric("Desviación Estándar (σ)", f"{np.sqrt(p_teorica * q_teorica):.4f}")
+            
+        elif tipo_grafica == "Superponer Ambas":
+            st.write("### Indicadores Comparados")
+            col_t, col_s = st.columns(2)
+            with col_t:
+                st.caption("Valores Teóricos")
+                st.metric("μ (Esperanza)", f"{p_teorica:.2f}")
+                st.metric("σ² (Varianza)", f"{p_teorica * q_teorica:.2f}")
+            with col_s:
+                st.caption("Valores Simulados")
+                st.metric("x̄ (Media)", f"{media_simulada:.2f}")
+                st.metric("s² (Varianza)", f"{var_simulada:.2f}")
+
+    with col_der_sup:
+        st.write("### Simulacion Visual")
+        st.pyplot(figura, use_container_width=True)
+        
+    return media_simulada, var_simulada, desv_simulada
+
+def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_simulada, var_simulada, desv_simulada, datos_raw):
+    """Muestra la tabla comparativa final, interpretaciones de datos y opciones de descarga."""
+    col_izq_inf, col_der_inf = st.columns([1.4, 1.6], gap="large")
+
+    media_teorica = p_teorica
+    var_teorica = p_teorica * q_teorica
+    desv_teorica = np.sqrt(var_teorica)
+
+    with col_izq_inf:
+        st.write("### Interpretación y Comparación")
+        p_simulada_porcentaje = (exitos_sim / n_muestra_final)
+        q_simulada_porcentaje = (fracasos_sim / n_muestra_final)
+        
+        st.write(f"Probabilidad de éxito (p): Teórica **{p_teorica:.2%}** | Simulada **{p_simulada_porcentaje:.2%}**")
+        st.write(f"Probabilidad de fracaso (q): Teórica **{q_teorica:.2%}** | Simulada **{q_simulada_porcentaje:.2%}**")
+        st.write(f"Tamaño de muestra global activo (N): **{n_muestra_final:,}**")
+        
+        st.write("**Tabla de Resultados Analizados:**")
+        datos_tabla = {
+            "Concepto": ["Media", "Varianza", "Desviación estándar", "Tamaño de muestra"],
+            "Valor teórico": [f"{media_teorica:.4f}", f"{var_teorica:.4f}", f"{desv_teorica:.4f}", f"{n_muestra_final:,}"],
+            "Valor simulado": [f"{media_simulada:.4f}", f"{var_simulada:.4f}", f"{desv_simulada:.4f}", f"{n_muestra_final:,}"],
+            "Diferencia": [f"{abs(media_teorica - media_simulada):.4f}", f"{abs(var_teorica - var_simulada):.4f}", f"{abs(desv_teorica - desv_simulada):.4f}", "-"]
+        }
+        df_comparativo = pd.DataFrame(datos_tabla)
+        st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
+        
+        # Elemento pro: Explicación de convergencia para verse más científico
+        if n_muestra_final >= 5000:
+            st.info("💡 **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
+
+    with col_der_inf:
+        st.write("### Herramientas y Reportes")
+
+        with st.expander("Ver Formulas Teoricas"):
+            st.latex(r"p + q = 1 \quad \lhd \quad \mu = p")
+            st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad \sigma = \sqrt{p \cdot q}")
+
+        # Elemento pro: Visor interactivo de los datos generados al momento
+        with st.expander("🔬 Inspeccionar Muestra Cruda Generada"):
+            df_inspeccion = pd.DataFrame({"Valor Obtenido (X)": datos_raw})
+            df_inspeccion.index.name = "ID_Experimento"
+            st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption(f"Mostrando los primeros 10 renglones experimentales de los {n_muestra_final:,} totales.")
+
+        df_descarga = pd.DataFrame(datos_raw, columns=["Resultado_Simulacion"])
+        csv_data = df_descarga.to_csv(index=True, index_label="Iteracion")
+        col_btn1, col_btn2 = st.columns(2)
+        
+        with col_btn1:
+            st.download_button(
+                label="Descargar CSV", data=csv_data,
+                file_name=f"simulacion_bernoulli_{p_teorica:.2f}.csv", mime="text/csv", use_container_width=True
+            )
+
+        with col_btn2:
+            reporte_texto = (
+                f"REPORTE DE LABORATORIO - DISTRIBUCION DE BERNOULLI\n"
+                f"--------------------------------------------------\n"
+                f"Concepto                Valor Teorico   Valor Simulado   Diferencia\n"
+                f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
+                f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
+                f"Desv. Estándar (sigma):  {desv_teorica:.4f}          {desv_simulada:.4f}           {abs(desv_teorica - desv_simulada):.4f}\n"
+                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             -"
+            )
+            st.download_button(
+                label="Descargar TXT", data=reporte_texto,
+                file_name=f"reporte_bernoulli_{p_teorica:.2f}.txt", mime="text/plain", use_container_width=True
+            )
+
 def inicializar_bernoulli():
     st.markdown("""
     <style>
@@ -141,186 +295,33 @@ def inicializar_bernoulli():
     st.markdown("---")
     inicializar_estado()
 
-    # ==========================================
-    # SECCIÓN 1: PARÁMETROS DE CONFIGURACIÓN
-    # ==========================================
-    st.subheader("Parametros de la distribucion")
+    # 1. Parámetros de Control
+    renderizar_controles_parametros()
     
-    col_izq_p, col_der_n = st.columns(2, gap="large")
-    
-    with col_izq_p:
-        st.write("**Probabilidad de exito (p):**")
-        st.slider(
-            "Probabilidad slider",
-            min_value=0.0, max_value=1.0, step=0.01,
-            key='slider_p',
-            on_change=actualizar_p_desde_slider,
-            label_visibility="collapsed"
-        )
-        col_txt_p, col_inp_p = st.columns([1.5, 1])
-        with col_txt_p:
-            st.write("O ingresa p manual:")
-        with col_inp_p:
-            st.number_input(
-                "Valor p input",
-                min_value=0.0, max_value=1.0, step=0.01,
-                key='input_p',
-                on_change=actualizar_p_desde_input,
-                label_visibility="collapsed"
-            )
-
-    with col_der_n:
-        st.write("**Tamaño de muestra global (N):**")
-        st.slider(
-            "Muestra slider",
-            min_value=2, max_value=100000, step=1,
-            key='slider_n',
-            on_change=actualizar_n_desde_slider,
-            label_visibility="collapsed"
-        )
-        col_txt_n, col_inp_n = st.columns([1.5, 1])
-        with col_txt_n:
-            st.write("O ingresa N manual:")
-        with col_inp_n:
-            st.number_input(
-                "Valor N input",
-                min_value=2, max_value=100000, step=1,
-                key='input_n',
-                on_change=actualizar_n_desde_input,
-                label_visibility="collapsed"
-            )
-        
-        # Corrección del error usando el callback seguro
-        st.button(
-            "Generar datos aleatorios de muestra", 
-            use_container_width=True, 
-            on_click=callback_muestra_aleatoria
-        )
-
     p_teorica = st.session_state['p_base']
     q_teorica = 1.0 - p_teorica
-    media_teorica = p_teorica
-    var_teorica = p_teorica * q_teorica
-    desv_teorica = np.sqrt(var_teorica)
     n_muestra_final = st.session_state['n_base']
 
     st.markdown("---")
 
-    # ==========================================
-    # SECCIÓN 2: SIMULACIÓN Y ENFOQUES VISUALES
-    # ==========================================
-    st.subheader("Resultados de la Simulacion")
-    
+    # 2. Selección de Enfoque Visual
     tipo_grafica_seleccionada = st.radio(
         "Selecciona el enfoque visual de la grafica:",
         ["Muestra Simulada", "Distribucion Teorica", "Superponer Ambas"],
-        index=0,
-        horizontal=True
+        index=0, horizontal=True
     )
 
-    col_izq_sup, col_der_sup = st.columns([1.2, 1.8], gap="large")
-    
+    # 3. Generación de Datos y Renderizado de Bloque Superior
     datos_raw, exitos_sim, fracasos_sim = generar_muestra_datos(p_teorica, q_teorica, n_muestra_final)
-    figura = generar_grafica_seleccionada(p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, tipo_grafica_seleccionada)
-
-    media_simulada = np.mean(datos_raw)
-    var_simulada = np.var(datos_raw, ddof=1)
-    desv_simulada = np.sqrt(var_simulada)
-
-    with col_izq_sup:
-        if tipo_grafica_seleccionada == "Muestra Simulada":
-            st.write("### Indicadores Simulados")
-            st.metric("Media Muestral (x̄)", f"{media_simulada:.4f}")
-            st.metric("Varianza Muestral (s²)", f"{var_simulada:.4f}")
-            st.metric("Desviación Estándar (s)", f"{desv_simulada:.4f}")
-            
-        elif tipo_grafica_seleccionada == "Distribucion Teorica":
-            st.write("### Indicadores Teoricos")
-            st.metric("Esperanza Matemática (μ)", f"{media_teorica:.4f}")
-            st.metric("Varianza Teórica (σ²)", f"{var_teorica:.4f}")
-            st.metric("Desviación Estándar (σ)", f"{desv_teorica:.4f}")
-            
-        elif tipo_grafica_seleccionada == "Superponer Ambas":
-            st.write("### Indicadores Comparados")
-            col_t, col_s = st.columns(2)
-            with col_t:
-                st.caption("Valores Teóricos")
-                st.metric("μ (Esperanza)", f"{media_teorica:.2f}")
-                st.metric("σ² (Varianza)", f"{var_teorica:.2f}")
-            with col_s:
-                st.caption("Valores Simulados")
-                st.metric("x̄ (Media)", f"{media_simulada:.2f}")
-                st.metric("s² (Varianza)", f"{var_simulada:.2f}")
-
-    with col_der_sup:
-        st.write("### Simulacion Visual")
-        st.pyplot(figura, use_container_width=True)
+    
+    media_sim, var_sim, desv_sim = renderizar_bloque_visualizacion(
+        p_teorica, q_teorica, n_muestra_final, datos_raw, exitos_sim, fracasos_sim, tipo_grafica_seleccionada
+    )
 
     st.markdown("##") 
     st.divider()
 
-    # ==========================================
-    # SECCIÓN 3: TABLA COMPARATIVA Y REPORTES
-    # ==========================================
-    col_izq_inf, col_der_inf = st.columns([1.4, 1.6], gap="large")
-
-    with col_izq_inf:
-        st.write("### Interpretación y Comparación")
-        
-        p_simulada_porcentaje = (exitos_sim / n_muestra_final)
-        q_simulada_porcentaje = (fracasos_sim / n_muestra_final)
-        
-        st.write(f"Probabilidad de éxito (p): Teórica **{p_teorica:.2%}** | Simulada **{p_simulada_porcentaje:.2%}**")
-        st.write(f"Probabilidad de fracaso (q): Teórica **{q_teorica:.2%}** | Simulada **{q_simulada_porcentaje:.2%}**")
-        st.write(f"Tamaño de muestra global activo (N): **{n_muestra_final:,}**")
-        
-        st.write("**Tabla de Resultados Analizados:**")
-        
-        # Estructura limpia: La fila final de Muestra combina las celdas y no muestra diferencias
-        datos_tabla = {
-            "Concepto": ["Media", "Varianza", "Desviación estándar", "Tamaño de muestra"],
-            "Valor teórico": [f"{media_teorica:.4f}", f"{var_teorica:.4f}", f"{desv_teorica:.4f}", f"{n_muestra_final:,}"],
-            "Valor simulado": [f"{media_simulada:.4f}", f"{var_simulada:.4f}", f"{desv_simulada:.4f}", f"{n_muestra_final:,}"],
-            "Diferencia": [f"{abs(media_teorica - media_simulada):.4f}", f"{abs(var_teorica - var_simulada):.4f}", f"{abs(desv_teorica - desv_simulada):.4f}", "-"]
-        }
-        df_comparativo = pd.DataFrame(datos_tabla)
-        st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
-
-    with col_der_inf:
-        st.write("### Herramientas y Reportes")
-
-        with st.expander("Ver Formulas Teoricas"):
-            st.latex(r"p + q = 1 \quad \lhd \quad \mu = p")
-            st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad \sigma = \sqrt{p \cdot q}")
-
-        df_descarga = pd.DataFrame(datos_raw, columns=["Resultado_Simulacion"])
-        csv_data = df_descarga.to_csv(index=True, index_label="Iteracion")
-        
-        col_btn1, col_btn2 = st.columns(2)
-        
-        with col_btn1:
-            st.download_button(
-                label="Descargar CSV",
-                data=csv_data,
-                file_name=f"simulacion_bernoulli_{p_teorica:.2f}.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
-
-        with col_btn2:
-            reporte_texto = (
-                f"REPORTE DE LABORATORIO - DISTRIBUCION DE BERNOULLI\n"
-                f"--------------------------------------------------\n"
-                f"Concepto                Valor Teorico   Valor Simulado   Diferencia\n"
-                f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
-                f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
-                f"Desv. Estándar (sigma):  {desv_teorica:.4f}          {desv_simulada:.4f}           {abs(desv_teorica - desv_simulada):.4f}\n"
-                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             -"
-            )
-            st.download_button(
-                label="Descargar TXT",
-                data=reporte_texto,
-                file_name=f"reporte_bernoulli_{p_teorica:.2f}.txt",
-                mime="text/plain",
-                use_container_width=True
-            )
+    # 4. Renderizado Analítico Inferior y Reportes
+    renderizar_analisis_y_reportes(
+        p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_sim, var_sim, desv_sim, datos_raw
+    )
