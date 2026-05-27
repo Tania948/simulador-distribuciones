@@ -213,9 +213,8 @@ def inicializar_bernoulli():
     datos_raw, exitos_sim, fracasos_sim = generar_muestra_datos(p_teorica, q_teorica, n_muestra_final)
     figura = generar_grafica_seleccionada(p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, tipo_grafica_seleccionada)
 
-    # Cálculos empíricos de la simulación real
     media_simulada = np.mean(datos_raw)
-    var_simulada = np.var(datos_raw, ddof=1) # ddof=1 para varianza muestral insesgada
+    var_simulada = np.var(datos_raw, ddof=1)
     desv_simulada = np.sqrt(var_simulada)
 
     with col_izq_sup:
@@ -251,22 +250,29 @@ def inicializar_bernoulli():
     st.divider()
 
     # ==========================================
-    # SECCIÓN 3: TABLA COMPARATIVA REQUERIDA Y REPORTES
+    # SECCIÓN 3: TABLA COMPARATIVA Y REPORTES
     # ==========================================
     col_izq_inf, col_der_inf = st.columns([1.4, 1.6], gap="large")
 
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
-        st.write(f"Probabilidad de exito (p): **{p_teorica:.2%}**")
-        st.write(f"Probabilidad de fracaso (q): **{q_teorica:.2%}**")
-        st.write(f"Tamaño de muestra activo (N): **{n_muestra_final:,}**")
+        
+        # Bloque de interpretación unificada (Teórica + Simulada)
+        p_simulada_porcentaje = (exitos_sim / n_muestra_final)
+        q_simulada_porcentaje = (fracasos_sim / n_muestra_final)
+        
+        st.write(f"Probabilidad de éxito (p): Teórica **{p_teorica:.2%}** | Simulada **{p_simulada_porcentaje:.2%}**")
+        st.write(f"Probabilidad de fracaso (q): Teórica **{q_teorica:.2%}** | Simulada **{q_simulada_porcentaje:.2%}**")
+        st.write(f"Tamaño de muestra global activo (N): **{n_muestra_final:,}**")
         
         st.write("**Tabla de Resultados Analizados:**")
+        
+        # Modificación para unificar la fila final sin restar diferencias innecesarias
         datos_tabla = {
             "Concepto": ["Media", "Varianza", "Desviación estándar", "Tamaño de muestra"],
-            "Valor teórico": [f"{media_teorica:.4f}", f"{var_teorica:.4f}", f"{desv_teorica:.4f}", f"{n_muestra_final}"],
-            "Valor simulado": [f"{media_simulada:.4f}", f"{var_simulada:.4f}", f"{desv_simulada:.4f}", f"{n_muestra_final}"],
-            "Diferencia": [f"{abs(media_teorica - media_simulada):.4f}", f"{abs(var_teorica - var_simulada):.4f}", f"{abs(desv_teorica - desv_simulada):.4f}", "0"]
+            "Valor teórico": [f"{media_teorica:.4f}", f"{var_teorica:.4f}", f"{desv_teorica:.4f}", f"{n_muestra_final:,}"],
+            "Valor simulado": [f"{media_simulada:.4f}", f"{var_simulada:.4f}", f"{desv_simulada:.4f}", f"{n_muestra_final:,}"],
+            "Diferencia": [f"{abs(media_teorica - media_simulada):.4f}", f"{abs(var_teorica - var_simulada):.4f}", f"{abs(desv_teorica - desv_simulada):.4f}", "-"]
         }
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
@@ -300,7 +306,7 @@ def inicializar_bernoulli():
                 f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
                 f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
                 f"Desv. Estándar (sigma):  {desv_teorica:.4f}          {desv_simulada:.4f}           {abs(desv_teorica - desv_simulada):.4f}\n"
-                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             0"
+                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             -"
             )
             st.download_button(
                 label="Descargar TXT",
