@@ -12,7 +12,7 @@ def intro_gamma():
         "La distribución Gamma es una distribución continua con dos parámetros que incluye a las "
         "distribuciones Exponencial y Chi-cuadrada como casos particulares. Se utiliza ampliamente "
         "para modelar variables que son asimétricas a la derecha, como el tiempo de espera hasta "
-        "que ocurren **α** eventos independientes en un proceso con tasa constante."
+        "que ocurren <strong>α</strong> eventos independientes en un proceso con tasa constante."
     )
 
 def inicializar_estado_gamma():
@@ -224,7 +224,7 @@ def renderizar_analisis_y_reportes_gamma(alpha, beta, N_global, media_sim, var_s
 
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
-        st.write(f"Forma configurada ($\alpha$): **{alpha}** | Escala configurada ($\beta$): **{beta}**")
+        st.write(f"Forma configurada ($\\alpha$): **{alpha}** | Escala configurada ($\\beta$): **{beta}**")
         
         st.write("**Tabla de Resultados Analizados:**")
         datos_tabla = {
