@@ -9,8 +9,8 @@ from css.estilos import titulo_rosa, parrafo_adaptable
 def intro_geometrica():
     titulo_rosa("Distribución Geométrica")
     parrafo_adaptable(
-        "La distribución Geométrica modela el número de **ensayos independientes de Bernoulli necesarios "
-        "para obtener el primer éxito**. Es una distribución discreta 'sin memoria', donde la probabilidad "
+        "La distribución Geométrica modela el número de <strong>ensayos independientes de Bernoulli necesarios "
+        "para obtener el primer éxito</strong>. Es una distribución discreta 'sin memoria', donde la probabilidad "
         "de éxito en cada intento es constantemente <strong>p</strong>."
     )
 
@@ -267,12 +267,12 @@ def renderizar_analisis_y_reportes_geometrica(p, N_global, media_sim, var_sim, d
 def renderizar_tlc_geometrica(p_teorica):
     """Demostración del TLC: Tomando promedios de variables Geométricas."""
     st.markdown("---")
-    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
         "Aunque la distribución geométrica original es totalmente asimétrica y sesgada a la izquierda (con forma de L invertida), "
         "cuando agrupamos varias de estas muestras independientes y calculamos su promedio, la combinación "
-        "de valores genera una hermosa curva **Normal simétrica**."
+        "de valores genera una hermosa curva <strong>Normal simétrica</strong>."
     )
     
     col_c1, col_c2 = st.columns(2, gap="large")
