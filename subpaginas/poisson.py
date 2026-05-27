@@ -10,7 +10,7 @@ def intro_poisson():
     titulo_rosa("Distribución de Poisson")
     parrafo_adaptable(
         "La distribución de Poisson expresa la probabilidad de que ocurra un número determinado de "
-        "eventos discretos en un **intervalo fijo de tiempo o espacio**, conociendo de antemano su "
+        "eventos discretos en un <strong>intervalo fijo de tiempo o espacio</strong>, conociendo de antemano su "
         "tasa promedio de ocurrencia (<strong>&lambda;</strong>) y bajo la condición de que estos "
         "eventos ocurren de forma independiente."
     )
@@ -218,7 +218,7 @@ def renderizar_analisis_y_reportes_poisson(lam, N_global, media_sim, var_sim, de
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
         # Elemento de valor para el reporte científico
-        st.info("📌 **Propiedad de Equidistribución:** Una característica única de Poisson es que su media es exactamente igual a su varianza ($\mu = \sigma^2 = \lambda$). Puedes ver que en los datos simulados los valores de x̄ y s² se persiguen muy de cerca.")
+        st.info("**Propiedad de Equidistribución:** Una característica única de Poisson es que su media es exactamente igual a su varianza ($\mu = \sigma^2 = \lambda$). Puedes ver que en los datos simulados los valores de x̄ y s² se persiguen muy de cerca.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
