@@ -54,6 +54,9 @@ def callback_muestra_aleatoria():
     st.session_state['n_base'] = n_aleatorio
     st.session_state['slider_n'] = n_aleatorio
     st.session_state['input_n'] = n_aleatorio
+    st.session_state['p_base'] = round(np.random.uniform(0.0, 1.0), 2)
+    st.session_state['slider_p'] = st.session_state['p_base']
+    st.session_state['input_p'] = st.session_state['p_base']
 
 def generar_muestra_datos(p, q, n_muestra):
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
