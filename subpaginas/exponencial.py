@@ -9,10 +9,10 @@ from css.estilos import titulo_rosa, parrafo_adaptable
 def intro_exponencial():
     titulo_rosa("Distribución Exponencial")
     parrafo_adaptable(
-        "La distribución Exponencial es una distribución continua que modela el **tiempo o espacio "
-        "que transcurre entre dos eventos consecutivos** en un proceso de Poisson. Es muy utilizada "
+        "La distribución Exponencial es una distribución continua que modela el <strong>tiempo o espacio</strong> "
+        "que transcurre entre dos eventos consecutivos en un proceso de Poisson. Es muy utilizada "
         "en ingeniería y fiabilidad para calcular la vida útil de componentes o tiempos de espera, "
-        "caracterizándose por su famosa propiedad de **falta de memoria**."
+        "caracterizándose por su famosa propiedad de <strong>falta de memoria</strong>."
     )
 
 def inicializar_estado_exponencial():
