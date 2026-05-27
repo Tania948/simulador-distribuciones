@@ -21,20 +21,18 @@ pestanas = st.tabs([
     "Poisson"
 ])
 
-with pestanas[0]:
-    mostrar_inicio()
 
-with pestanas[1]:
+with pestanas[0]:
     inicializar_bernoulli()
 
-with pestanas[2]:
+with pestanas[1]:
     inicializar_binomial()
 
-with pestanas[3]:
+with pestanas[2]:
     inicializar_geometrica()
 
-with pestanas[4]:
+with pestanas[3]:
     inicializar_hipergeometrica()
 
-with pestanas[5]:
+with pestanas[4]:
     inicializar_poisson()
