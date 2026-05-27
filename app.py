@@ -6,6 +6,7 @@ from subpaginas.binomial import inicializar_binomial
 from subpaginas.hipergeometrica import inicializar_hipergeometrica
 from subpaginas.poisson import inicializar_poisson
 from subpaginas.uniforme import inicializar_uniforme
+from subpaginas.normal import inicializar_normal
 from css.estilos import importar_estilos
 
 
@@ -42,3 +43,6 @@ with pestanas[4]:
 
 with pestanas[5]:
     inicializar_uniforme()
+
+with pestanas[6]:
+    inicializar_normal()
