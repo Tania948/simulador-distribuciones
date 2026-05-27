@@ -16,7 +16,6 @@ def intro_uniforme():
     )
 
 def inicializar_estado_uniforme():
-    # a: Límite inferior
     if 'uniforme_a' not in st.session_state:
         st.session_state['uniforme_a'] = 0.0
     if 'slider_uniforme_a' not in st.session_state:
@@ -24,7 +23,6 @@ def inicializar_estado_uniforme():
     if 'input_uniforme_a' not in st.session_state:
         st.session_state['input_uniforme_a'] = st.session_state['uniforme_a']
         
-    # b: Límite superior
     if 'uniforme_b' not in st.session_state:
         st.session_state['uniforme_b'] = 10.0
     if 'slider_uniforme_b' not in st.session_state:
@@ -32,7 +30,6 @@ def inicializar_estado_uniforme():
     if 'input_uniforme_b' not in st.session_state:
         st.session_state['input_uniforme_b'] = st.session_state['uniforme_b']
 
-    # N_global: Cantidad de datos continuos en la muestra
     if 'N_uniforme_global_base' not in st.session_state:
         st.session_state['N_uniforme_global_base'] = 1000
     if 'slider_N_uniforme_global' not in st.session_state:

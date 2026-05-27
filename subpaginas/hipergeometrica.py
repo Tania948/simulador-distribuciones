@@ -321,7 +321,7 @@ def renderizar_analisis_y_reportes_hipergeometrica(N_pob, K_exitos, n_muestra, N
 
 def renderizar_tlc_hipergeometrica(N_pob, K_exitos, n_muestra):
     st.markdown("---")
-    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
         "Al promediar múltiples conjuntos independientes de variables hipergeométricas, las fluctuaciones "

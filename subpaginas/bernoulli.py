@@ -65,7 +65,6 @@ def generar_muestra_datos(p, q, n_muestra):
     return datos_simulados, exitos, fracasos
 
 def renderizar_controles_parametros():
-    """Renderiza la sección de configuración de p y N de manera simétrica."""
     st.subheader("Parametros de la distribucion")
     col_izq_p, col_der_n = st.columns(2, gap="large")
     
@@ -235,7 +234,7 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
         if n_muestra_final >= 5000:
-            st.info(" **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
+            st.info(" **Nota de Laboratorio:** Al usar un tamaño de muestra grande,  las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")

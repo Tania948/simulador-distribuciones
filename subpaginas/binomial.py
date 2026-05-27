@@ -288,7 +288,6 @@ def renderizar_analisis_y_reportes_binomial(n, p, N_global, media_sim, var_sim, 
             )
 
 def renderizar_tlc_binomial(n_ensayos, p_teorica):
-    """Demostración del TLC: Tomando muestras de la distribución Binomial."""
     st.markdown("---")
     st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
@@ -309,14 +308,12 @@ def renderizar_tlc_binomial(n_ensayos, p_teorica):
             min_value=2, max_value=100, value=30, step=1, key="tlc_binom_k"
         )
 
-    # Simulación del TLC con Binomial
     matriz_binom = np.random.binomial(n=n_ensayos, p=p_teorica, size=(num_muestras, tam_muestra_tlc))
     promedios_muestrales = np.mean(matriz_binom, axis=1)
     
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
     
-    # Curva teórica normal del TLC
     mu_tlc = n_ensayos * p_teorica
     sigma_tlc = np.sqrt(n_ensayos * p_teorica * (1.0 - p_teorica)) / np.sqrt(tam_muestra_tlc)
     

@@ -253,7 +253,7 @@ def renderizar_analisis_y_reportes_poisson(lam, N_global, media_sim, var_sim, de
 
 def renderizar_tlc_poisson(lam):
     st.markdown("---")
-    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
         "Cuando recolectamos los conteos de múltiples intervalos independientes de Poisson y calculamos su promedio, "

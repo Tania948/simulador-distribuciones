@@ -257,7 +257,6 @@ def renderizar_analisis_y_reportes_geometrica(p, N_global, media_sim, var_sim, d
             )
 
 def renderizar_tlc_geometrica(p_teorica):
-    """Demostración del TLC: Tomando promedios de variables Geométricas."""
     st.markdown("---")
     st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
