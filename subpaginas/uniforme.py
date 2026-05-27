@@ -11,7 +11,7 @@ def intro_uniforme():
     parrafo_adaptable(
         "La distribución Uniforme Continua modela un escenario donde todos los resultados posibles "
         "dentro de un intervalo cerrado definido por un límite inferior <strong>a</strong> y un límite "
-        "superior <strong>b</strong> son **igualmente probables**. Al ser una distribución continua, "
+        "superior <strong>b</strong> son <strong>igualmente probables</strong>. Al ser una distribución continua, "
         "su función de densidad de probabilidad (PDF) dibuja un rectángulo perfecto."
     )
 
@@ -246,7 +246,7 @@ def renderizar_analisis_y_reportes_uniforme(a, b, N_global, media_sim, var_sim, 
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("📊 **Nota Teórica de Altura:** En este modelo continuo, la altura máxima de la curva teórica es exactamente $1 / (b - a)$. Al superponer las gráficas, puedes notar cómo los bins de la muestra de datos crudos se alinean para rellenar equitativamente esa área unitaria.")
+        st.info("**Nota Teórica de Altura:** En este modelo continuo, la altura máxima de la curva teórica es exactamente $1 / (b - a)$. Al superponer las gráficas, puedes notar cómo los bins de la muestra de datos crudos se alinean para rellenar equitativamente esa área unitaria.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
@@ -289,12 +289,12 @@ def renderizar_analisis_y_reportes_uniforme(a, b, N_global, media_sim, var_sim, 
 
 def renderizar_tlc_uniforme(a, b):
     st.markdown("---")
-    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
         "Aunque una sola muestra uniforme se ve completamente plana y rectangular, al tomar grupos "
         "independientes de estas variables continuas y graficar el promedio de cada grupo, la forma plana "
-        "desaparece por completo y renace como una **curva Gaussiana Normal**."
+        "desaparece por completo y renace como una <strong>curva Gaussiana Normal</strong>."
     )
     
     col_c1, col_c2 = st.columns(2, gap="large")
