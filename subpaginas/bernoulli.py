@@ -14,22 +14,23 @@ def intro_bernoulli():
     )
 
 def inicializar_estado():
-    if 'p_base' not in st.session_state:
-        st.session_state['p_base'] = 0.30
+    # p: Probabilidad de éxito
+    if 'bernoulli_p' not in st.session_state:
+        st.session_state['bernoulli_p'] = 0.30
     if 'slider_p' not in st.session_state:
-        st.session_state['slider_p'] = st.session_state['p_base']
+        st.session_state['slider_p'] = st.session_state['bernoulli_p']
     if 'input_p' not in st.session_state:
-        st.session_state['input_p'] = st.session_state['p_base']
+        st.session_state['input_p'] = st.session_state['bernoulli_p']
         
-    if 'n_base' not in st.session_state:
-        st.session_state['n_base'] = 1000
+    # N: Tamaño de la muestra global
+    if 'N_bernoulli_base' not in st.session_state:
+        st.session_state['N_bernoulli_base'] = 1000
     if 'slider_n' not in st.session_state:
-        st.session_state['slider_n'] = st.session_state['n_base']
+        st.session_state['slider_n'] = st.session_state['N_bernoulli_base']
     if 'input_n' not in st.session_state:
-        st.session_state['input_n'] = st.session_state['n_base']
+        st.session_state['input_n'] = st.session_state['N_bernoulli_base']
 
-# Modifica estas funciones dentro de subpaginas/bernoulli.py
-
+# --- Callbacks de Sincronización ---
 def actualizar_p_desde_slider():
     st.session_state['bernoulli_p'] = st.session_state['slider_p']
     st.session_state['input_p'] = st.session_state['slider_p']
@@ -39,27 +40,26 @@ def actualizar_p_desde_input():
     st.session_state['bernoulli_p'] = valor
     st.session_state['slider_p'] = valor
 
-def actualizar_N_desde_slider():
-    st.session_state['N_bernoulli_base'] = st.session_state['slider_N_bernoulli']
-    st.session_state['input_N_bernoulli'] = st.session_state['slider_N_bernoulli']
+def actualizar_n_desde_slider():
+    st.session_state['N_bernoulli_base'] = st.session_state['slider_n']
+    st.session_state['input_n'] = st.session_state['slider_n']
 
-def actualizar_N_desde_input():
-    valor = min(max(int(st.session_state['input_N_bernoulli']), 5), 100000)
+def actualizar_n_desde_input():
+    valor = min(max(int(st.session_state['input_n']), 5), 100000)
     st.session_state['N_bernoulli_base'] = valor
-    st.session_state['slider_N_bernoulli'] = valor
+    st.session_state['slider_n'] = valor
 
 def callback_muestra_aleatoria_bernoulli():
     p_aleatorio = round(float(np.random.uniform(0.1, 0.9)), 2)
     N_aleatorio = int(np.random.randint(500, 10000))
     
-    # Asignamos de forma segura a las variables de control
     st.session_state['bernoulli_p'] = p_aleatorio
     st.session_state['slider_p'] = p_aleatorio
     st.session_state['input_p'] = p_aleatorio
 
     st.session_state['N_bernoulli_base'] = N_aleatorio
-    st.session_state['slider_N_bernoulli'] = N_aleatorio
-    st.session_state['input_N_bernoulli'] = N_aleatorio
+    st.session_state['slider_n'] = N_aleatorio
+    st.session_state['input_n'] = N_aleatorio
 
 def generar_muestra_datos(p, q, n_muestra):
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
@@ -90,7 +90,7 @@ def renderizar_controles_parametros():
     with col_der_n:
         st.write("**Tamaño de muestra global (N):**")
         st.slider(
-            "Muestra slider", min_value=2, max_value=100000, step=1,
+            "Muestra slider", min_value=5, max_value=100000, step=10,
             key='slider_n', on_change=actualizar_n_desde_slider, label_visibility="collapsed"
         )
         col_txt_n, col_inp_n = st.columns([1.5, 1])
@@ -98,15 +98,16 @@ def renderizar_controles_parametros():
             st.write("O ingresa N manual:")
         with col_inp_n:
             st.number_input(
-                "Valor N input", min_value=2, max_value=100000, step=1,
+                "Valor N input", min_value=5, max_value=100000, step=10,
                 key='input_n', on_change=actualizar_n_desde_input, label_visibility="collapsed"
             )
         
-        st.button(
-            "Generar datos aleatorios de muestra", 
-            use_container_width=True, 
-            on_click=callback_muestra_aleatoria
-        )
+    st.button(
+        "Generar datos aleatorios de muestra", 
+        key="btn_aleatorio_bern",
+        use_container_width=True, 
+        on_click=callback_muestra_aleatoria_bernoulli
+    )
 
 def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
@@ -170,7 +171,6 @@ def generar_grafica_seleccionada(p, q, n_muestra, exitos, fracasos, tipo_grafica
     return fig
 
 def renderizar_bloque_visualizacion(p_teorica, q_teorica, n_muestra_final, datos_raw, exitos_sim, fracasos_sim, tipo_grafica):
-    """Muestra las métricas dinámicas superiores y el gráfico correspondiente."""
     st.subheader("Resultados de la Simulacion")
     
     col_izq_sup, col_der_sup = st.columns([1.2, 1.8], gap="large")
@@ -212,7 +212,6 @@ def renderizar_bloque_visualizacion(p_teorica, q_teorica, n_muestra_final, datos
     return media_simulada, var_simulada, desv_simulada
 
 def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_simulada, var_simulada, desv_simulada, datos_raw):
-    """Muestra la tabla comparativa final, interpretaciones de datos y opciones de descarga."""
     col_izq_inf, col_der_inf = st.columns([1.4, 1.6], gap="large")
 
     media_teorica = p_teorica
@@ -238,9 +237,8 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        # Elemento pro: Explicación de convergencia para verse más científico
         if n_muestra_final >= 5000:
-            st.info(" **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
+            st.info("📊 **Nota de Laboratorio:** Al usar un tamaño de muestra grande, notarás que las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
@@ -249,7 +247,6 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
             st.latex(r"p + q = 1 \quad \lhd \quad \mu = p")
             st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad \sigma = \sqrt{p \cdot q}")
 
-        # Elemento pro: Visor interactivo de los datos generados al momento
         with st.expander("Inspeccionar Muestra Cruda Generada"):
             df_inspeccion = pd.DataFrame({"Valor Obtenido (X)": datos_raw})
             df_inspeccion.index.name = "ID_Experimento"
@@ -262,7 +259,7 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
         
         with col_btn1:
             st.download_button(
-                label="Descargar CSV", data=csv_data,
+                label="Descargar CSV", data=csv_data, key="dl_csv_bern",
                 file_name=f"simulacion_bernoulli_{p_teorica:.2f}.csv", mime="text/csv", use_container_width=True
             )
 
@@ -277,18 +274,17 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
                 f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             -"
             )
             st.download_button(
-                label="Descargar TXT", data=reporte_texto,
+                label="Descargar TXT", data=reporte_texto, key="dl_txt_bern",
                 file_name=f"reporte_bernoulli_{p_teorica:.2f}.txt", mime="text/plain", use_container_width=True
             )
 
 def renderizar_teorema_limite_central(p_teorica):
-    """Genera una simulación interactiva para demostrar el TLC usando variables Bernoulli."""
     st.markdown("---")
     st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
         "El TLC dicta que si sumamos o promediamos muchas variables aleatorias independientes (como los éxitos de Bernoulli), "
-        "la distribución de esos promedios <style='color: #E04D98;'>convergerá a una distribución Normal (Campana de Gauss)</style>, "
+        "la distribución de esos promedios convergerá a una distribución Normal (Campana de Gauss), "
         "sin importar que la distribución original sea discreta."
     )
     
@@ -296,33 +292,24 @@ def renderizar_teorema_limite_central(p_teorica):
     with col_ctrl1:
         num_muestras = st.slider(
             "Número de experimentos repetidos (m):", 
-            min_value=100, max_value=5000, value=2000, step=100,
-            help="Cuántas veces recolectaremos un grupo de datos para promediarlos."
+            min_value=100, max_value=5000, value=2000, step=100, key="tlc_m_bern"
         )
     with col_ctrl2:
         tam_muestra_tlc = st.slider(
             "Tamaño de cada grupo/muestra (k):", 
-            min_value=2, max_value=100, value=30, step=1,
-            help="A mayor tamaño de grupo, más perfecta será la curva de la campana de Gauss."
+            min_value=2, max_value=100, value=30, step=1, key="tlc_k_bern"
         )
 
-    # Simulación del TLC: Generamos una matriz de (num_muestras x tam_muestra_tlc)
-    # Cada fila representa una muestra de tamaño 'k'
-    matriz_bernoulli = np.random.choice([0, 1], size=(num_samples := num_muestras, tam_muestra_tlc), p=[1-p_teorica, p_teorica])
-    
-    # Calculamos el promedio de cada fila (cada muestra)
+    matriz_bernoulli = np.random.choice([0, 1], size=(num_muestras, tam_muestra_tlc), p=[1-p_teorica, p_teorica])
     promedios_muestrales = np.mean(matriz_bernoulli, axis=1)
     
-    # Crear la gráfica del histograma
     fig, ax = plt.subplots(figsize=(7, 3.5))
     
-    # Histograma de los promedios con una línea de densidad (KDE) aproximada
-    conteos, bins, parches = ax.hist(
+    ax.hist(
         promedios_muestrales, bins=min(20, len(np.unique(promedios_muestrales))), 
         density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales'
     )
     
-    # Curva teórica normal superpuesta para contrastar
     mu_tlc = p_teorica
     sigma_tlc = np.sqrt((p_teorica * (1 - p_teorica)) / tam_muestra_tlc)
     xmin, xmax = ax.get_xlim()
@@ -330,7 +317,6 @@ def renderizar_teorema_limite_central(p_teorica):
     curve_teorica = (1 / (sigma_tlc * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x_axis - mu_tlc) / sigma_tlc)**2)
     ax.plot(x_axis, curve_teorica, color='#31333F', linewidth=2.5, linestyle='--', label='Tendencia Normal Teórica')
     
-    # Estética de la gráfica
     ax.set_title(f"Distribución de {num_muestras:,} Promedios Muestrales (Cada uno con k = {tam_muestra_tlc})", fontsize=10, fontweight='bold')
     ax.set_xlabel("Valor del Promedio Muestral (x̄)", fontsize=9)
     ax.set_ylabel("Densidad de Probabilidad", fontsize=9)
@@ -340,7 +326,6 @@ def renderizar_teorema_limite_central(p_teorica):
     ax.grid(axis='y', linestyle='--', alpha=0.3)
     plt.tight_layout()
     
-    # Mostrar en Streamlit
     col_graf, col_info = st.columns([1.8, 1.2], gap="large")
     with col_graf:
         st.pyplot(fig, use_container_width=True)
@@ -348,8 +333,8 @@ def renderizar_teorema_limite_central(p_teorica):
         st.write("### Evidencia de Laboratorio")
         st.write(f"Al agrupar de **{tam_muestra_tlc} en {tam_muestra_tlc}** las variables Bernoulli:")
         st.markdown(f"* **Esperanza del Promedio:** {np.mean(promedios_muestrales):.4f} (Teórico: {mu_tlc:.4f})")
-        st.markdown(f"* **Error Estándar ($\sigma_x$):** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_tlc:.4f})")
-        st.info("Se aprecia como la línea punteada gris (Teoría Normal) abraza casi perfectamente a las barras rosas (Datos Simulados). Por lo tanto, el TLC se cumple: La distribución de los promedios muestrales se aproxima a una campana de Gauss")
+        st.markdown(f"* **Error Estándar:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_tlc:.4f})")
+        st.info("Se aprecia como la línea punteada gris (Teoría Normal) abraza casi perfectamente a las barras rosas. Por lo tanto, el TLC se cumple.")
 
 def inicializar_bernoulli():
     st.markdown("""
@@ -366,23 +351,20 @@ def inicializar_bernoulli():
     st.markdown("---")
     inicializar_estado()
 
-    # 1. Parámetros de Control
     renderizar_controles_parametros()
     
-    p_teorica = st.session_state['p_base']
+    p_teorica = st.session_state['bernoulli_p']
     q_teorica = 1.0 - p_teorica
-    n_muestra_final = st.session_state['n_base']
+    n_muestra_final = st.session_state['N_bernoulli_base']
 
     st.markdown("---")
 
-    # 2. Selección de Enfoque Visual
     tipo_grafica_seleccionada = st.radio(
         "Selecciona el enfoque visual de la grafica:",
         ["Muestra Simulada", "Distribucion Teorica", "Superponer Ambas"],
-        index=0, horizontal=True
+        index=0, horizontal=True, key="radio_bern"
     )
 
-    # 3. Generación de Datos y Renderizado de Bloque Superior
     datos_raw, exitos_sim, fracasos_sim = generar_muestra_datos(p_teorica, q_teorica, n_muestra_final)
     
     media_sim, var_sim, desv_sim = renderizar_bloque_visualizacion(
@@ -390,9 +372,6 @@ def inicializar_bernoulli():
     )
 
     st.markdown("##") 
-    st.divider()
-
-    st.markdown("##")    
     st.divider()
 
     renderizar_analisis_y_reportes(
