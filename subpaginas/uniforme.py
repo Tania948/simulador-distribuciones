@@ -236,7 +236,7 @@ def renderizar_analisis_y_reportes_uniforme(a, b, N_global, media_sim, var_sim, 
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Nota Teórica de Altura:** En este modelo continuo, la altura máxima de la curva teórica es exactamente $1 / (b - a)$. Al superponer las gráficas, puedes notar cómo los bins de la muestra de datos crudos se alinean para rellenar equitativamente esa área unitaria.")
+        st.info("**Nota Teórica de Altura:** En este modelo continuo, la altura máxima de la curva teórica es exactamente $1 / (b - a)$. Al superponer las gráficas, se puede apreciar cómo los bins de la muestra de datos crudos se alinean para rellenar equitativamente esa área unitaria.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")

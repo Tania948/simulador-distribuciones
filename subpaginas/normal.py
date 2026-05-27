@@ -11,8 +11,8 @@ def intro_normal():
     parrafo_adaptable(
         "La distribución Normal es la más importante de la probabilidad y la estadística. "
         "Modela fenómenos naturales, sociales y técnicos donde la mayoría de los datos se agrupan "
-        "en torno a un valor central conocido como **media (μ)**, disminuyendo de forma simétrica "
-        "a medida que nos alejamos de él, dibujando la famosa **Campana de Gauss**."
+        "en torno a un valor central conocido como <strong>media (μ)</strong>, disminuyendo de forma simétrica "
+        "a medida que nos alejamos de él, dibujando la famosa <strong>Campana de Gauss</strong>."
     )
 
 def inicializar_estado_normal():
@@ -232,7 +232,7 @@ def renderizar_analisis_y_reportes_normal(mu, sigma, N_global, media_sim, var_si
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Nota Teórica de Densidad:** Al superponer las gráficas, puedes observar la regla empírica. Aproximadamente el 68% de tus datos experimentales caerán de manera natural dentro del rango de una desviación estándar respecto al centro.")
+        st.info("**Nota Teórica de Densidad:** Al superponer las gráficas, se puede apreciar la regla empírica. Aproximadamente el 68% de los datos experimentales caerán de manera natural dentro del rango de una desviación estándar respecto al centro.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
