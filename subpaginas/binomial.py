@@ -139,7 +139,8 @@ def renderizar_controles_parametros():
             )
             
     st.button(
-        "Generar datos aleatorios de muestra", 
+        "Generar datos aleatorios de muestra",
+        key="btn_generar_binomial",  # <--- ¡AÑADE ESTA LÍNEA AQUÍ! 
         use_container_width=True, 
         on_click=callback_muestra_aleatoria_binomial
     )
