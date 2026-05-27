@@ -84,14 +84,12 @@ def callback_muestra_aleatoria_uniforme():
     st.session_state['input_N_uniforme_global'] = N_global
 
 def generar_muestra_datos_uniforme(a, b, N_global):
-    # np.random.uniform toma los límites bajo (low) y alto (high)
     datos_simulados = np.random.uniform(low=a, high=b, size=N_global)
     return datos_simulados
 
 def renderizar_controles_parametros():
     st.subheader("Parámetros de la distribución")
     
-    # Lectura preventiva para asegurar consistencia de rangos en los controles
     a_actual = st.session_state['uniforme_a']
     b_actual = st.session_state['uniforme_b']
     
@@ -100,22 +98,22 @@ def renderizar_controles_parametros():
     with col_a:
         st.write("**Límite Inferior (a):**")
         st.slider(
-            "Uniforme a slider", min_value=-100.0, max_value=float(b_actual - 0.1), step=0.5,
+            "Uniforme a slider", min_value=-100.0, max_value=float(b_actual - 0.5), step=0.5,
             key='slider_uniforme_a', on_change=actualizar_uniforme_a_desde_slider, label_visibility="collapsed"
         )
         st.number_input(
-            "Uniforme a input", min_value=-100.0, max_value=float(b_actual - 0.1), step=0.5,
+            "Uniforme a input", min_value=-100.0, max_value=float(b_actual - 0.5), step=0.5,
             key='input_uniforme_a', on_change=actualizar_uniforme_a_desde_input, label_visibility="collapsed"
         )
 
     with col_b:
         st.write("**Límite Superior (b):**")
         st.slider(
-            "Uniforme b slider", min_value=float(a_actual + 0.1), max_value=100.0, step=0.5,
+            "Uniforme b slider", min_value=float(a_actual + 0.5), max_value=100.0, step=0.5,
             key='slider_uniforme_b', on_change=actualizar_uniforme_b_desde_slider, label_visibility="collapsed"
         )
         st.number_input(
-            "Uniforme b input", min_value=float(a_actual + 0.1), max_value=100.0, step=0.5,
+            "Uniforme b input", min_value=float(a_actual + 0.5), max_value=100.0, step=0.5,
             key='input_uniforme_b', on_change=actualizar_uniforme_b_desde_input, label_visibility="collapsed"
         )
 
@@ -140,37 +138,30 @@ def renderizar_controles_parametros():
 def generar_grafica_uniforme(a, b, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Al ser continua, usamos densidades de probabilidad e histogramas con bins de densidad
     rango_ancho = b - a
     num_bins = 20
-    
-    # Eje X extendido un 15% a los lados para apreciar dónde empieza y termina el rectángulo
     x_eje = np.linspace(a - (rango_ancho * 0.15), b + (rango_ancho * 0.15), 200)
-    
-    # Densidad teórica uniforme: 1 / (b - a) dentro del rango, 0 fuera
     pdf_teorica = uniform.pdf(x_eje, loc=a, scale=rango_ancho)
 
     if tipo_grafica == "Muestra Simulada":
-        # Multiplicamos por la densidad del área real para escalar el conteo absoluto estimado
         ax.hist(datos_raw, bins=num_bins, color='#31333F', alpha=0.85, edgecolor='white', label='Simulado')
         ax.set_ylabel('Frecuencia Absoluta (Conteos)', fontsize=11)
         
     elif tipo_grafica == "Distribucion Teorica":
-        ax.plot(x_eje, pdf_teorica, color='#E04D98', linewidth=3, label='Teórico (PDF)')
+        ax.plot(x_eje, pdf_teorica, color='#E04D98', linewidth=3, label='Teorico (PDF)')
         ax.fill_between(x_eje, pdf_teorica, color='#E04D98', alpha=0.2)
-        ax.set_ylabel('Densidad de Probabilidad $f(x)$', fontsize=11)
+        ax.set_ylabel('Densidad de Probabilidad f(x)', fontsize=11)
         
     elif tipo_grafica == "Superponer Ambas":
-        # Para poder superponer un histograma continuo con una PDF teórica line, el histograma DEBE ser density=True
-        # Para que sea entendible en términos de frecuencia, calculamos la escala en el eje derecho secundario si hiciera falta,
-        # o normalizamos ambos sobre el mismo eje de densidad. Lo haremos sobre densidad para perfecta simetría científica.
         ax.hist(datos_raw, bins=num_bins, density=True, color='#31333F', alpha=0.7, edgecolor='white', label='Simulado (Densidad)')
-        ax.plot(x_eje, pdf_teorica, color='#FF69B4', linewidth=2.5, label='Teórico (PDF)')
+        ax.plot(x_eje, pdf_teorica, color='#FF69B4', linewidth=2.5, label='Teorico (PDF)')
         ax.set_ylabel('Densidad Escalada', fontsize=11)
         ax.legend(loc='upper right', frameon=False)
 
     ax.set_xlabel('Valor de la Variable Continua (X)', fontsize=11)
-    ax.set_title(f'Distribución Uniforme Continua ($a = {a}$, $b = {b}$)', fontsize=11, fontweight='bold')
+    
+    # IMPORTANTE: Eliminamos los signos de $ conflictivos para evitar errores del parser mathtext
+    ax.set_title(f'Distribución Uniforme Continua (a = {a}, b = {b})', fontsize=11, fontweight='bold')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.grid(axis='y', linestyle='--', alpha=0.3)
@@ -188,7 +179,6 @@ def renderizar_bloque_visualizacion_uniforme(a, b, N_global, datos_raw, tipo_gra
     var_sim = np.var(datos_raw, ddof=1)
     desv_sim = np.sqrt(var_sim)
     
-    # Fórmulas analíticas teóricas de la uniforme continua
     media_teo = (a + b) / 2.0
     var_teo = ((b - a) ** 2) / 12.0
     desv_teo = np.sqrt(var_teo)
@@ -309,14 +299,12 @@ def renderizar_tlc_uniforme(a, b):
             min_value=2, max_value=100, value=30, step=1, key="tlc_unif_k"
         )
 
-    # Simulación del TLC con datos uniformes continuos
     matriz_unif = np.random.uniform(low=a, high=b, size=(num_muestras, tam_muestra_tlc))
     promedios_muestrales = np.mean(matriz_unif, axis=1)
     
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
     
-    # Ecuaciones teóricas de la campana resultante por TLC
     mu_tlc = (a + b) / 2.0
     sigma_unif_individual = np.sqrt(((b - a) ** 2) / 12.0)
     sigma_tlc = sigma_unif_individual / np.sqrt(tam_muestra_tlc)
@@ -362,7 +350,6 @@ def inicializar_uniforme():
     b_val = st.session_state['uniforme_b']
     N_global = st.session_state['N_uniforme_global_base']
 
-    # Blindaje lógico manual cruzado por si fallara la sincronización temporal en inputs
     if a_val >= b_val:
         b_val = a_val + 1.0
 
