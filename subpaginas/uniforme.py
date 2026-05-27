@@ -40,7 +40,6 @@ def inicializar_estado_uniforme():
     if 'input_N_uniforme_global' not in st.session_state:
         st.session_state['input_N_uniforme_global'] = st.session_state['N_uniforme_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_uniforme_a_desde_slider():
     st.session_state['uniforme_a'] = st.session_state['slider_uniforme_a']
     st.session_state['input_uniforme_a'] = st.session_state['slider_uniforme_a']
@@ -160,7 +159,6 @@ def generar_grafica_uniforme(a, b, N_global, datos_raw, tipo_grafica):
 
     ax.set_xlabel('Valor de la Variable Continua (X)', fontsize=11)
     
-    # IMPORTANTE: Eliminamos los signos de $ conflictivos para evitar errores del parser mathtext
     ax.set_title(f'Distribución Uniforme Continua (a = {a}, b = {b})', fontsize=11, fontweight='bold')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)

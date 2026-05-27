@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 from subpaginas.bernoulli import inicializar_bernoulli
 from subpaginas.geometrica import inicializar_geometrica

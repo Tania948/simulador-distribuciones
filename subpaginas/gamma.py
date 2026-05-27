@@ -1,4 +1,3 @@
-# subpaginas/gamma.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +15,6 @@ def intro_gamma():
     )
 
 def inicializar_estado_gamma():
-    # alpha: Parámetro de Forma (Shape)
     if 'gamma_alpha' not in st.session_state:
         st.session_state['gamma_alpha'] = 2.0
     if 'slider_gamma_alpha' not in st.session_state:
@@ -24,7 +22,6 @@ def inicializar_estado_gamma():
     if 'input_gamma_alpha' not in st.session_state:
         st.session_state['input_gamma_alpha'] = st.session_state['gamma_alpha']
         
-    # beta: Parámetro de Escala (Scale)
     if 'gamma_beta' not in st.session_state:
         st.session_state['gamma_beta'] = 2.0
     if 'slider_gamma_beta' not in st.session_state:
@@ -32,7 +29,6 @@ def inicializar_estado_gamma():
     if 'input_gamma_beta' not in st.session_state:
         st.session_state['input_gamma_beta'] = st.session_state['gamma_beta']
 
-    # N_global: Cantidad de datos en la muestra
     if 'N_gamma_global_base' not in st.session_state:
         st.session_state['N_gamma_global_base'] = 1000
     if 'slider_N_gamma_global' not in st.session_state:
@@ -40,7 +36,6 @@ def inicializar_estado_gamma():
     if 'input_N_gamma_global' not in st.session_state:
         st.session_state['input_N_gamma_global'] = st.session_state['N_gamma_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_gamma_alpha_desde_slider():
     st.session_state['gamma_alpha'] = st.session_state['slider_gamma_alpha']
     st.session_state['input_gamma_alpha'] = st.session_state['slider_gamma_alpha']
@@ -86,7 +81,6 @@ def callback_muestra_aleatoria_gamma():
     st.session_state['input_N_gamma_global'] = N_global
 
 def generar_muestra_datos_gamma(alpha, beta, N_global):
-    # En numpy: shape = alpha, scale = beta
     datos_simulados = np.random.gamma(shape=alpha, scale=beta, size=N_global)
     return datos_simulados
 
@@ -138,11 +132,9 @@ def renderizar_controles_parametros():
 def generar_grafica_gamma(alpha, beta, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Eje X desde 0 hasta una zona donde la cola ya bajó lo suficiente
     max_x = float(np.percentile(datos_raw, 99))
     x_eje = np.linspace(0, max_x, 300)
     
-    # En scipy.stats.gamma: a = alpha, scale = beta
     pdf_teorica = gamma.pdf(x_eje, a=alpha, scale=beta)
     num_bins = 30
 

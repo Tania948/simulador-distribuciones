@@ -16,7 +16,6 @@ def intro_normal():
     )
 
 def inicializar_estado_normal():
-    # mu: Media (Centro de la campana)
     if 'normal_mu' not in st.session_state:
         st.session_state['normal_mu'] = 0.0
     if 'slider_normal_mu' not in st.session_state:
@@ -24,7 +23,6 @@ def inicializar_estado_normal():
     if 'input_normal_mu' not in st.session_state:
         st.session_state['input_normal_mu'] = st.session_state['normal_mu']
         
-    # sigma: Desviación Estándar (Dispersión)
     if 'normal_sigma' not in st.session_state:
         st.session_state['normal_sigma'] = 1.0
     if 'slider_normal_sigma' not in st.session_state:

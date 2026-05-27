@@ -1,4 +1,3 @@
-# subpaginas/exponencial.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +15,6 @@ def intro_exponencial():
     )
 
 def inicializar_estado_exponencial():
-    # lambda_tasa: Tasa de eventos (frecuencia de ocurrencia)
     if 'exponencial_lambda' not in st.session_state:
         st.session_state['exponencial_lambda'] = 1.0
     if 'slider_exponencial_lambda' not in st.session_state:
@@ -24,7 +22,6 @@ def inicializar_estado_exponencial():
     if 'input_exponencial_lambda' not in st.session_state:
         st.session_state['input_exponencial_lambda'] = st.session_state['exponencial_lambda']
 
-    # N_global: Cantidad de datos en la muestra
     if 'N_exponencial_global_base' not in st.session_state:
         st.session_state['N_exponencial_global_base'] = 1000
     if 'slider_N_exponencial_global' not in st.session_state:
@@ -32,7 +29,6 @@ def inicializar_estado_exponencial():
     if 'input_N_exponencial_global' not in st.session_state:
         st.session_state['input_N_exponencial_global'] = st.session_state['N_exponencial_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_exponencial_lambda_desde_slider():
     st.session_state['exponencial_lambda'] = st.session_state['slider_exponencial_lambda']
     st.session_state['input_exponencial_lambda'] = st.session_state['slider_exponencial_lambda']
@@ -64,7 +60,6 @@ def callback_muestra_aleatoria_exponencial():
     st.session_state['input_N_exponencial_global'] = N_global
 
 def generar_muestra_datos_exponencial(lambda_tasa, N_global):
-    # IMPORTANTE: NumPy usa el parámetro 'scale' que es el inverso de lambda (1 / lambda)
     tiempo_promedio = 1.0 / lambda_tasa
     datos_simulados = np.random.exponential(scale=tiempo_promedio, size=N_global)
     return datos_simulados
@@ -86,7 +81,6 @@ def renderizar_controles_parametros():
         )
 
     with col_vacio:
-        # Columna estética para balancear la visualización y mostrar el parámetro derivado (Tiempo promedio)
         lambda_actual = st.session_state['exponencial_lambda']
         st.write("**Tiempo Promedio Esperado (1/lambda):**")
         st.info(f"Cada evento ocurre en promedio cada: **{1.0 / lambda_actual:.4f}** unidades de tiempo.")
@@ -112,8 +106,7 @@ def renderizar_controles_parametros():
 def generar_grafica_exponencial(lambda_tasa, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Eje X va desde 0 hasta el valor máximo de la muestra para capturar el decaimiento
-    max_x = float(np.percentile(datos_raw, 98)) # Cortamos en el percentil 98 para evitar que colas extremas arruinen el zoom
+    max_x = float(np.percentile(datos_raw, 98)) 
     x_eje = np.linspace(0, max_x, 300)
     pdf_teorica = expon.pdf(x_eje, scale=1.0/lambda_tasa)
     num_bins = 30
