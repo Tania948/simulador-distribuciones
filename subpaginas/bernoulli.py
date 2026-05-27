@@ -48,6 +48,13 @@ def actualizar_n_desde_input():
     st.session_state['n_base'] = valor_validado
     st.session_state['slider_n'] = valor_validado
 
+def callback_muestra_aleatoria():
+    """Genera de forma segura el valor aleatorio antes del renderizado de los widgets."""
+    n_aleatorio = int(np.random.randint(2, 10001))
+    st.session_state['n_base'] = n_aleatorio
+    st.session_state['slider_n'] = n_aleatorio
+    st.session_state['input_n'] = n_aleatorio
+
 def generar_muestra_datos(p, q, n_muestra):
     datos_simulados = np.random.choice([0, 1], size=n_muestra, p=[q, p])
     exitos = np.sum(datos_simulados == 1)
@@ -180,12 +187,12 @@ def inicializar_bernoulli():
                 label_visibility="collapsed"
             )
         
-        if st.button("Generar datos aleatorios de muestra", use_container_width=True):
-            n_aleatorio = int(np.random.randint(2, 10001))
-            st.session_state['n_base'] = n_aleatorio
-            st.session_state['slider_n'] = n_aleatorio
-            st.session_state['input_n'] = n_aleatorio
-            st.rerun()
+        # Corrección del error usando el callback seguro
+        st.button(
+            "Generar datos aleatorios de muestra", 
+            use_container_width=True, 
+            on_click=callback_muestra_aleatoria
+        )
 
     p_teorica = st.session_state['p_base']
     q_teorica = 1.0 - p_teorica
@@ -257,7 +264,6 @@ def inicializar_bernoulli():
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         
-        # Bloque de interpretación unificada (Teórica + Simulada)
         p_simulada_porcentaje = (exitos_sim / n_muestra_final)
         q_simulada_porcentaje = (fracasos_sim / n_muestra_final)
         
@@ -267,7 +273,7 @@ def inicializar_bernoulli():
         
         st.write("**Tabla de Resultados Analizados:**")
         
-        # Modificación para unificar la fila final sin restar diferencias innecesarias
+        # Estructura limpia: La fila final de Muestra combina las celdas y no muestra diferencias
         datos_tabla = {
             "Concepto": ["Media", "Varianza", "Desviación estándar", "Tamaño de muestra"],
             "Valor teórico": [f"{media_teorica:.4f}", f"{var_teorica:.4f}", f"{desv_teorica:.4f}", f"{n_muestra_final:,}"],
@@ -306,7 +312,7 @@ def inicializar_bernoulli():
                 f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
                 f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
                 f"Desv. Estándar (sigma):  {desv_teorica:.4f}          {desv_simulada:.4f}           {abs(desv_teorica - desv_simulada):.4f}\n"
-                f"Tamaño de Muestra (N):   {n_muestra_final}                         "
+                f"Tamaño de Muestra (N):   {n_muestra_final}            {n_muestra_final}             -"
             )
             st.download_button(
                 label="Descargar TXT",
