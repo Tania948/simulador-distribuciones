@@ -280,6 +280,76 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
                 file_name=f"reporte_bernoulli_{p_teorica:.2f}.txt", mime="text/plain", use_container_width=True
             )
 
+def renderizar_teorema_limite_central(p_teorica):
+    """Genera una simulación interactiva para demostrar el TLC usando variables Bernoulli."""
+    st.markdown("---")
+    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    
+    parrafo_adaptable(
+        "El TLC dicta que si sumamos o promediamos muchas variables aleatorias independientes (como los éxitos de Bernoulli), "
+        "la distribución de esos promedios **convergerá a una distribución Normal (Campana de Gauss)**, "
+        "sin importar que la distribución original sea discreta."
+    )
+    
+    col_ctrl1, col_ctrl2 = st.columns(2, gap="large")
+    with col_ctrl1:
+        num_muestras = st.slider(
+            "Número de experimentos repetidos (m):", 
+            min_value=100, max_value=5000, value=2000, step=100,
+            help="Cuántas veces recolectaremos un grupo de datos para promediarlos."
+        )
+    with col_ctrl2:
+        tam_muestra_tlc = st.slider(
+            "Tamaño de cada grupo/muestra (k):", 
+            min_value=2, max_value=100, value=30, step=1,
+            help="A mayor tamaño de grupo, más perfecta será la curva de la campana de Gauss."
+        )
+
+    # Simulación del TLC: Generamos una matriz de (num_muestras x tam_muestra_tlc)
+    # Cada fila representa una muestra de tamaño 'k'
+    matriz_bernoulli = np.random.choice([0, 1], size=(num_samples := num_muestras, tam_muestra_tlc), p=[1-p_teorica, p_teorica])
+    
+    # Calculamos el promedio de cada fila (cada muestra)
+    promedios_muestrales = np.mean(matriz_bernoulli, axis=1)
+    
+    # Crear la gráfica del histograma
+    fig, ax = plt.subplots(figsize=(7, 3.5))
+    
+    # Histograma de los promedios con una línea de densidad (KDE) aproximada
+    conteos, bins, parches = ax.hist(
+        promedios_muestrales, bins=min(20, len(np.unique(promedios_muestrales))), 
+        density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales'
+    )
+    
+    # Curva teórica normal superpuesta para contrastar
+    mu_tlc = p_teorica
+    sigma_tlc = np.sqrt((p_teorica * (1 - p_teorica)) / tam_muestra_tlc)
+    xmin, xmax = ax.get_xlim()
+    x_axis = np.linspace(xmin, xmax, 100)
+    curve_teorica = (1 / (sigma_tlc * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x_axis - mu_tlc) / sigma_tlc)**2)
+    ax.plot(x_axis, curve_teorica, color='#31333F', linewidth=2.5, linestyle='--', label='Tendencia Normal Teórica')
+    
+    # Estética de la gráfica
+    ax.set_title(f"Distribución de {num_muestras:,} Promedios Muestrales (Cada uno con k = {tam_muestra_tlc})", fontsize=10, fontweight='bold')
+    ax.set_xlabel("Valor del Promedio Muestral (x̄)", fontsize=9)
+    ax.set_ylabel("Densidad de Probabilidad", fontsize=9)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.legend(loc='upper right', frameon=False, fontsize=8)
+    ax.grid(axis='y', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+    
+    # Mostrar en Streamlit
+    col_graf, col_info = st.columns([1.8, 1.2], gap="large")
+    with col_graf:
+        st.pyplot(fig, use_container_width=True)
+    with col_info:
+        st.write("### Evidencia de Laboratorio")
+        st.write(f"Al agrupar de **{tam_muestra_tlc} en {tam_muestra_tlc}** tus variables Bernoulli:")
+        st.markdown(f"* **Esperanza del Promedio:** {np.mean(promedios_muestrales):.4f} (Teórico: {mu_tlc:.4f})")
+        st.markdown(f"* **Error Estándar ($\sigma_x$):** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_tlc:.4f})")
+        st.info("🎯 Mira cómo la línea punteada gris (Teoría Normal) abraza casi perfectamente a tus barras rosas (Datos Simulados). ¡El TLC se cumple!")
+
 def inicializar_bernoulli():
     st.markdown("""
     <style>
@@ -325,3 +395,12 @@ def inicializar_bernoulli():
     renderizar_analisis_y_reportes(
         p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_sim, var_sim, desv_sim, datos_raw
     )
+    # ... (todo tu código anterior de la sección 4 permanece igual)
+    
+    # 4. Renderizado Analítico Inferior y Reportes
+    renderizar_analisis_y_reportes(
+        p_teorica, q_teorica, n_muestra_final, exitos_sim, fracasos_sim, media_sim, var_sim, desv_sim, datos_raw
+    )
+
+    # ¡NUEVA LÍNEA COMPLEMENTARIA AQUÍ!
+    renderizar_teorema_limite_central(p_teorica)
