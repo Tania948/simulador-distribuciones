@@ -317,7 +317,7 @@ def renderizar_tlc_geometrica(p_teorica):
         st.write("### Evidencia de TLC")
         st.markdown(f"* **Media Esperada:** {np.mean(promedios_muestrales):.4f} (Teórica: {mu_tlc:.4f})")
         st.markdown(f"* **Error Estándar Muestral:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_tlc:.4f})")
-        st.info("¡Sorprendente! Una distribución que originalmente tenía forma de rampa descendente se convierte en una campana perfectamente simétrica gracias al TLC.")
+        st.info("Una distribución que originalmente tenía forma de rampa descendente se convierte en una campana perfectamente simétrica gracias al TLC.")
 
 def inicializar_geometrica():
     st.markdown("""
