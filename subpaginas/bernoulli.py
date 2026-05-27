@@ -283,7 +283,7 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
 def renderizar_teorema_limite_central(p_teorica):
     """Genera una simulación interactiva para demostrar el TLC usando variables Bernoulli."""
     st.markdown("---")
-    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
         "El TLC dicta que si sumamos o promediamos muchas variables aleatorias independientes (como los éxitos de Bernoulli), "

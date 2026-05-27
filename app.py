@@ -13,7 +13,6 @@ importar_estilos()
 st.title("Simulador de Distribuciones - Probabilidad y estadística")
 
 pestanas = st.tabs([
-    "Inicio",
     "Bernoulli", 
     "Binomial", 
     "Geometrica", 
