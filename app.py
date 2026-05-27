@@ -5,6 +5,10 @@ from subpaginas.geometrica import inicializar_geometrica
 from subpaginas.binomial import inicializar_binomial
 from subpaginas.hipergeometrica import inicializar_hipergeometrica
 from subpaginas.poisson import inicializar_poisson
+from subpaginas.uniforme import inicializar_uniforme
+from subpaginas.normal import inicializar_normal
+from subpaginas.exponencial import inicializar_exponencial
+from subpaginas.gamma import inicializar_gamma
 from css.estilos import importar_estilos
 
 
@@ -16,7 +20,11 @@ pestanas = st.tabs([
     "Binomial", 
     "Geometrica", 
     "Hipergeometrica", 
-    "Poisson"
+    "Poisson",
+    "Uniforme",
+    "Normal",
+    "Exponencial",
+    "Gamma"
 ])
 
 
@@ -34,3 +42,15 @@ with pestanas[3]:
 
 with pestanas[4]:
     inicializar_poisson()
+
+with pestanas[5]:
+    inicializar_uniforme()
+
+with pestanas[6]:
+    inicializar_normal()
+
+with pestanas[7]:
+    inicializar_exponencial()
+
+with pestanas[8]:
+    inicializar_gamma()
