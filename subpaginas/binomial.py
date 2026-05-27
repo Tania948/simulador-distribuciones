@@ -299,10 +299,10 @@ def renderizar_analisis_y_reportes_binomial(n, p, N_global, media_sim, var_sim, 
 def renderizar_tlc_binomial(n_ensayos, p_teorica):
     """Demostración del TLC: Tomando muestras de la distribución Binomial."""
     st.markdown("---")
-    st.subheader("🔬 Demostración del Teorema del Límite Central (TLC)")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
     
     parrafo_adaptable(
-        "Incluso si la Binomial es inherentemente discreta y asimétrica (cuando $p$ está cerca de 0 o 1), "
+        "Incluso si la Binomial es inherentemente discreta y asimétrica (cuando p está cerca de 0 o 1), "
         "el promedio de múltiples variables Binomiales independientes convergerá hacia una distribución Normal continua."
     )
     
