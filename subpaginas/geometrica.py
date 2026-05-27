@@ -15,7 +15,6 @@ def intro_geometrica():
     )
 
 def inicializar_estado_geometrica():
-    # p: Probabilidad de éxito constante en cada intento
     if 'p_geom_base' not in st.session_state:
         st.session_state['p_geom_base'] = 0.25
     if 'slider_geom_p' not in st.session_state:
@@ -23,7 +22,6 @@ def inicializar_estado_geometrica():
     if 'input_geom_p' not in st.session_state:
         st.session_state['input_geom_p'] = st.session_state['p_geom_base']
         
-    # N: Tamaño de muestra global (Cuántos 'primeros éxitos' vamos a buscar en total)
     if 'N_geom_global_base' not in st.session_state:
         st.session_state['N_geom_global_base'] = 1000
     if 'slider_N_geom_global' not in st.session_state:
@@ -31,14 +29,12 @@ def inicializar_estado_geometrica():
     if 'input_N_geom_global' not in st.session_state:
         st.session_state['input_N_geom_global'] = st.session_state['N_geom_global_base']
 
-# --- Callbacks de Sincronización ---
 def actualizar_geom_p_desde_slider():
     st.session_state['p_geom_base'] = st.session_state['slider_geom_p']
     st.session_state['input_geom_p'] = st.session_state['slider_geom_p']
 
 def actualizar_geom_p_desde_input():
     valor = st.session_state['input_geom_p']
-    # Evitamos p=0 porque causaría infinitos intentos para el éxito
     valor_validado = min(max(valor, 0.01), 1.0)
     st.session_state['p_geom_base'] = valor_validado
     st.session_state['slider_geom_p'] = valor_validado
@@ -65,7 +61,6 @@ def callback_muestra_aleatoria_geometrica():
     st.session_state['input_N_geom_global'] = N_aleatorio
 
 def generar_muestra_datos_geometrica(p, N_global):
-    # np.random.geometric cuenta desde 1 (número de intentos totales hasta incluir el éxito)
     datos_simulados = np.random.geometric(p=p, size=N_global)
     return datos_simulados
 
@@ -103,7 +98,7 @@ def renderizar_controles_parametros():
             
     st.button(
         "Generar datos aleatorios de muestra", 
-        key="btn_generar_geometrica",  # ¡Evita duplicados de IDs!
+        key="btn_generar_geometrica",  
         use_container_width=True, 
         on_click=callback_muestra_aleatoria_geometrica
     )
@@ -111,20 +106,17 @@ def renderizar_controles_parametros():
 def generar_grafica_geometrica(p, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Determinar el alcance del eje X basado en los datos simulados reales
-    max_intentos = int(np.percentile(datos_raw, 98)) # Cortamos en el percentil 98 para evitar colas infinitas feas
-    max_intentos = max(max_intentos, 5) # Forzar un mínimo visible de barras
+    max_intentos = int(np.percentile(datos_raw, 98)) 
+    max_intentos = max(max_intentos, 5)
     
     x_valores = np.arange(1, max_intentos + 1)
     
-    # Frecuencias simuladas corregidas
     valores_sim, conteos_sim = np.unique(datos_raw, return_counts=True)
     frecuencias_simuladas = np.zeros(max_intentos)
     for v, c in zip(valores_sim, conteos_sim):
         if v <= max_intentos:
             frecuencias_simuladas[v - 1] = c
 
-    # Frecuencias teóricas calculadas con SciPy PMF
     frecuencias_teoricas = geom.pmf(x_valores, p) * N_global
 
     ancho_barra = 0.35
@@ -287,14 +279,12 @@ def renderizar_tlc_geometrica(p_teorica):
             min_value=2, max_value=100, value=30, step=1, key="tlc_geom_k"
         )
 
-    # Simulación real del TLC con variables geométricas
     matriz_geom = np.random.geometric(p=p_teorica, size=(num_muestras, tam_muestra_tlc))
     promedios_muestrales = np.mean(matriz_geom, axis=1)
     
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
     
-    # Ecuaciones de transformación del TLC para geométrica
     mu_tlc = 1.0 / p_teorica
     sigma_tlc = (np.sqrt(1.0 - p_teorica) / p_teorica) / np.sqrt(tam_muestra_tlc)
     

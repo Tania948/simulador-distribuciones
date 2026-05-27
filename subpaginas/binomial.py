@@ -82,7 +82,6 @@ def callback_muestra_aleatoria_binomial():
     st.session_state['input_N_global'] = N_aleatorio
 
 def generar_muestra_datos_binomial(n, p, N_global):
-    # Genera la simulación Binomial real usando numpy
     datos_simulados = np.random.binomial(n=n, p=p, size=N_global)
     return datos_simulados
 
@@ -143,16 +142,13 @@ def renderizar_controles_parametros():
 def generar_grafica_binomial(n, p, N_global, datos_raw, tipo_grafica):
     fig, ax = plt.subplots(figsize=(7, 4.2))
     
-    # Rango de valores posibles para el eje X (de 0 a n éxitos)
     x_valores = np.arange(0, n + 1)
     
-    # Obtener frecuencias absolutas de la simulación
     valores_sim, conteos_sim = np.unique(datos_raw, return_counts=True)
     frecuencias_simuladas = np.zeros(n + 1)
     for v, c in zip(valores_sim, conteos_sim):
         if v <= n: frecuencias_simuladas[v] = c
 
-    # Obtener frecuencias teóricas calculadas con SciPy PMF
     frecuencias_teoricas = binom.pmf(x_valores, n, p) * N_global
 
     ancho_barra = 0.35
@@ -249,7 +245,7 @@ def renderizar_analisis_y_reportes_binomial(n, p, N_global, media_sim, var_sim, 
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
         if N_global >= 5000:
-            st.info("🔬 **Nota de Laboratorio:** Observa cómo al incrementar los experimentos globales ($N$), los estadísticos experimentales se acoplan casi perfectamente a las ecuaciones teóricas.")
+            st.info("**Nota de Laboratorio:** Observa cómo al incrementar los experimentos globales ($N$), los estadísticos experimentales se acoplan casi perfectamente a las ecuaciones teóricas.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
