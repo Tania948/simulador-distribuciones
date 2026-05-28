@@ -1,4 +1,3 @@
-# subpaginas/uniforme.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -144,18 +143,17 @@ def generar_grafica_uniforme(a, b, N_global, datos_raw, tipo_grafica):
         ax.set_ylabel('Frecuencia Absoluta (Conteos)', fontsize=11)
         
     elif tipo_grafica == "Distribucion Teorica":
-        ax.plot(x_eje, pdf_teorica, color='#E04D98', linewidth=3, label='Teorico (PDF)')
+        ax.plot(x_eje, pdf_teorica, color='#E04D98', linewidth=3, label='Teórico (PDF)')
         ax.fill_between(x_eje, pdf_teorica, color='#E04D98', alpha=0.2)
         ax.set_ylabel('Densidad de Probabilidad f(x)', fontsize=11)
         
     elif tipo_grafica == "Superponer Ambas":
         ax.hist(datos_raw, bins=num_bins, density=True, color='#31333F', alpha=0.7, edgecolor='white', label='Simulado (Densidad)')
-        ax.plot(x_eje, pdf_teorica, color='#FF69B4', linewidth=2.5, label='Teorico (PDF)')
+        ax.plot(x_eje, pdf_teorica, color='#FF69B4', linewidth=2.5, label='Teórico (PDF)')
         ax.set_ylabel('Densidad Escalada', fontsize=11)
         ax.legend(loc='upper right', frameon=False)
 
     ax.set_xlabel('Valor de la Variable Continua (X)', fontsize=11)
-    
     ax.set_title(f'Distribución Uniforme Continua (a = {a}, b = {b})', fontsize=11, fontweight='bold')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -216,6 +214,8 @@ def renderizar_analisis_y_reportes_uniforme(a, b, N_global, media_sim, var_sim, 
     var_teo = ((b - a) ** 2) / 12.0
     desv_teo = np.sqrt(var_teo)
 
+    pdf_valores = uniform.pdf(datos_raw, loc=a, scale=(b - a))
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Rango de valores continuos permitidos: **[{a}, {b}]**")
@@ -241,12 +241,19 @@ def renderizar_analisis_y_reportes_uniforme(a, b, N_global, media_sim, var_sim, 
             st.latex(r"\sigma^2 = \frac{(b - a)^2}{12}")
             st.latex(r"f(x) = \frac{1}{b - a} \quad \text{para } a \le x \le b")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Valores Continuos (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PDF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Valores Continuos (X)": datos_raw,
+                "PDF Teórica f(X)": pdf_valores
+            })
             df_inspeccion.index.name = "ID_Muestra"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption("Visualización de las primeras 10 coordenadas continuas junto a su altura de densidad teórica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Valores_Uniforme_Continua"])
+        df_descarga = pd.DataFrame({
+            "Valores_Uniforme_Continua": datos_raw,
+            "PDF_Teorica": pdf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="ID")
         col_btn1, col_btn2 = st.columns(2)
         
