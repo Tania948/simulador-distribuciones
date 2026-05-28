@@ -1,4 +1,3 @@
-# subpaginas/poisson.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -195,6 +194,9 @@ def renderizar_analisis_y_reportes_poisson(lam, N_global, media_sim, var_sim, de
     var_teo = lam
     desv_teo = np.sqrt(lam)
 
+    # Cálculo explícito de la masa probabilística teórica individual
+    pmf_valores = poisson.pmf(datos_raw, lam)
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Tasa promedio teórica configurada (&lambda;): **{lam}** sucesos/intervalo")
@@ -220,12 +222,19 @@ def renderizar_analisis_y_reportes_poisson(lam, N_global, media_sim, var_sim, de
             st.latex(r"\sigma^2 = \lambda \quad \lhd \quad \sigma = \sqrt{\lambda}")
             st.latex(r"P(X = k) = \frac{e^{-\lambda} \cdot \lambda^k}{k!}")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Eventos en Intervalo (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PMF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Eventos en Intervalo (X)": datos_raw,
+                "PMF Teórica P(X=k)": pmf_valores
+            })
             df_inspeccion.index.name = "ID_Intervalo"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption("Visualización de los primeros 10 intervalos simulados junto a su probabilidad exacta teórica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Conteo_Eventos_Poisson"])
+        df_descarga = pd.DataFrame({
+            "Conteo_Eventos_Poisson": datos_raw,
+            "PMF_Teorica": pmf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="Intervalo")
         col_btn1, col_btn2 = st.columns(2)
         
