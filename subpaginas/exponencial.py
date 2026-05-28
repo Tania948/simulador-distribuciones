@@ -305,7 +305,7 @@ def renderizar_tlc_exponencial(lambda_tasa):
         st.write("### Convergencia Estadística")
         st.markdown(f"* **Media de Promedios:** {np.mean(promedios_muestrales):.4f} (Teórica: {mu_teo_tlc:.4f})")
         st.markdown(f"* **Error Estándar Muestral:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_teo_tlc:.4f})")
-        st.info("💡 Observa cómo al incrementar el tamaño **k**, la asimetría original de la exponencial se desvanece por completo, adoptando una estructura simétrica perfecta.")
+        st.info("Al incrementar el tamaño **k**, la asimetría original de la exponencial se desvanece por completo, adoptando una estructura simétrica perfecta.")
 
 def inicializar_exponencial():
     st.markdown("""
