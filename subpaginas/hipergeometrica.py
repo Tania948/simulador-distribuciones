@@ -1,4 +1,3 @@
-# subpaginas/hipergeometrica.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -262,6 +261,8 @@ def renderizar_analisis_y_reportes_hipergeometrica(N_pob, K_exitos, n_muestra, N
     var_teo = n_muestra * p_equivalente * (1.0 - p_equivalente) * factor_correccion
     desv_teo = np.sqrt(var_teo)
 
+    pmf_valores = hypergeom.pmf(datos_raw, N_pob, K_exitos, n_muestra)
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Proporción de éxitos inicial en población ($K/N$): **{p_equivalente:.2%}**")
@@ -277,7 +278,7 @@ def renderizar_analisis_y_reportes_hipergeometrica(N_pob, K_exitos, n_muestra, N
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        if N_pob >= 500 and (n_muestra / N_pob) < 0.05:
+        if N_pob >= 50 and (n_muestra / N_pob) < 0.05:
             st.info("💡 **Dato de Laboratorio:** Como el tamaño de muestra ($n$) es menor al 5% de la población ($N$), el factor de corrección se acerca a 1. En este punto, la Hipergeométrica se comporta casi idéntica a una Binomial.")
 
     with col_der_inf:
@@ -288,12 +289,19 @@ def renderizar_analisis_y_reportes_hipergeometrica(N_pob, K_exitos, n_muestra, N
             st.latex(r"\sigma^2 = n \cdot \frac{K}{N} \cdot \left(1 - \frac{K}{N}\right) \cdot \frac{N - n}{N - 1}")
             st.latex(r"P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Éxitos en Muestra (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PMF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Éxitos en Muestra (X)": datos_raw,
+                "PMF Teórica P(X=k)": pmf_valores
+            })
             df_inspeccion.index.name = "ID_Simulacion"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption(f"Visualización de los primeros 10 cierres de éxito junto a su probabilidad de masa (PMF) teórica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Exitos_Hipergeometrica"])
+        df_descarga = pd.DataFrame({
+            "Exitos_Hipergeometrica": datos_raw,
+            "PMF_Teorica": pmf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="ID")
         col_btn1, col_btn2 = st.columns(2)
         
