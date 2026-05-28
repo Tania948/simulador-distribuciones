@@ -187,6 +187,8 @@ def renderizar_analisis_y_reportes_exponencial(lambda_tasa, N_global, media_sim,
     var_teo = 1.0 / (lambda_tasa ** 2)
     desv_teo = 1.0 / lambda_tasa
 
+    pdf_valores = expon.pdf(datos_raw, scale=1.0/lambda_tasa)
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Tasa configurada ($\lambda$): **{lambda_tasa}** eventos por unidad de tiempo.")
@@ -212,12 +214,19 @@ def renderizar_analisis_y_reportes_exponencial(lambda_tasa, N_global, media_sim,
             st.latex(r"\mu = \frac{1}{\lambda}")
             st.latex(r"\sigma^2 = \frac{1}{\lambda^2}")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Tiempo Transcurrido (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PDF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Tiempo Transcurrido (X)": datos_raw,
+                "PDF Teórica f(X)": pdf_valores
+            })
             df_inspeccion.index.name = "ID_Muestra"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption("Visualización de las primeras 10 coordenadas continuas junto a su altura de densidad teórica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Valores_Tiempos_Exponenciales"])
+        df_descarga = pd.DataFrame({
+            "Valores_Tiempos_Exponenciales": datos_raw,
+            "PDF_Teorica": pdf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="ID")
         col_btn1, col_btn2 = st.columns(2)
         
@@ -242,6 +251,61 @@ def renderizar_analisis_y_reportes_exponencial(lambda_tasa, N_global, media_sim,
                 label="Descargar TXT", data=reporte_texto,
                 key="dl_txt_exp", file_name=f"reporte_exponencial_lambda{lambda_tasa}.txt", mime="text/plain", use_container_width=True
             )
+
+def renderizar_tlc_exponencial(lambda_tasa):
+    st.markdown("---")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
+    
+    parrafo_adaptable(
+        "El TLC establece que si sumamos o promediamos un número suficientemente grande <strong>k</strong> "
+        "de variables aleatorias independientes e idénticamente distribuidas (i.i.d.), la distribución "
+        "de esos promedios <strong>tenderá a una distribución Normal</strong>, sin importar que la población "
+        "origen sea altamente asimétrica, como lo es la distribución exponencial."
+    )
+    
+    col_c1, col_c2 = st.columns(2, gap="large")
+    with col_c1:
+        num_muestras = st.slider(
+            "Número de promedios calculados (m):", 
+            min_value=100, max_value=5000, value=2000, step=100, key="tlc_exp_m"
+        )
+    with col_c2:
+        tam_muestra_tlc = st.slider(
+            "Tamaño de cada muestra agrupada (k):", 
+            min_value=2, max_value=100, value=30, step=1, key="tlc_exp_k"
+        )
+
+    tiempo_promedio = 1.0 / lambda_tasa
+    matriz_exponencial = np.random.exponential(scale=tiempo_promedio, size=(num_muestras, tam_muestra_tlc))
+    
+    promedios_muestrales = np.mean(matriz_exponencial, axis=1)
+    
+    fig, ax = plt.subplots(figsize=(7, 3.5))
+    ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
+    
+    mu_teo_tlc = 1.0 / lambda_tasa
+    sigma_teo_tlc = (1.0 / lambda_tasa) / np.sqrt(tam_muestra_tlc)
+    
+    xmin, xmax = ax.get_xlim()
+    x_axis = np.linspace(xmin, xmax, 100)
+    curve_teorica = (1 / (sigma_teo_tlc * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x_axis - mu_teo_tlc) / sigma_teo_tlc)**2)
+    ax.plot(x_axis, curve_teorica, color='#31333F', linewidth=2.5, linestyle='--', label='Campana Gaussiana Límite')
+    
+    ax.set_title(f"Distribución de {num_muestras:,} Promedios (Muestras de tamaño k = {tam_muestra_tlc})", fontsize=10, fontweight='bold')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.legend(loc='upper right', frameon=False, fontsize=8)
+    ax.grid(axis='y', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+    
+    col_graf, col_info = st.columns([1.8, 1.2], gap="large")
+    with col_graf:
+        st.pyplot(fig, use_container_width=True)
+    with col_info:
+        st.write("### Convergencia Estadística")
+        st.markdown(f"* **Media de Promedios:** {np.mean(promedios_muestrales):.4f} (Teórica: {mu_teo_tlc:.4f})")
+        st.markdown(f"* **Error Estándar Muestral:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_teo_tlc:.4f})")
+        st.info("💡 Observa cómo al incrementar el tamaño **k**, la asimetría original de la exponencial se desvanece por completo, adoptando una estructura simétrica perfecta.")
 
 def inicializar_exponencial():
     st.markdown("""
@@ -283,3 +347,6 @@ def inicializar_exponencial():
     renderizar_analisis_y_reportes_exponencial(
         lambda_val, N_global, media_sim, var_sim, desv_sim, datos_raw
     )
+
+    # Invocación final de la sección del TLC interactivo
+    renderizar_tlc_exponencial(lambda_val)
