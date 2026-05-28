@@ -1,4 +1,3 @@
-# subpaginas/geometrica.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -197,6 +196,8 @@ def renderizar_analisis_y_reportes_geometrica(p, N_global, media_sim, var_sim, d
     var_teo = (1.0 - p) / (p ** 2)
     desv_teo = np.sqrt(var_teo)
 
+    pmf_valores = geom.pmf(datos_raw, p)
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Cada dato representa cuántos tiros tomó conseguir **1 Éxito**.")
@@ -224,13 +225,19 @@ def renderizar_analisis_y_reportes_geometrica(p, N_global, media_sim, var_sim, d
             st.latex(r"\sigma^2 = \frac{1 - p}{p^2} \quad \lhd \quad \sigma = \frac{\sqrt{1 - p}}{p}")
             st.latex(r"P(X = k) = (1-p)^{k-1} \cdot p")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Intentos Totales (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PMF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Intentos Totales (X)": datos_raw,
+                "PMF Teórica P(X=k)": pmf_valores
+            })
             df_inspeccion.index.name = "ID_Experimento"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
-            st.caption(f"Visualización de los primeros 10 cierres de éxito del total de {N_global:,} iteraciones.")
+            st.caption(f"Visualización de los primeros 10 cierres de éxito junto a su probabilidad de masa (PMF) teórica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Intentos_Hasta_Exito"])
+        df_descarga = pd.DataFrame({
+            "Intentos_Hasta_Exito": datos_raw,
+            "PMF_Teorica": pmf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="ID")
         col_btn1, col_btn2 = st.columns(2)
         
