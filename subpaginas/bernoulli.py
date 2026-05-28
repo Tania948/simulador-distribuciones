@@ -6,7 +6,7 @@ from scipy.stats import bernoulli
 from css.estilos import titulo_rosa, parrafo_adaptable
 
 def intro_bernoulli():
-    titulo_rosa("Distribución de PRUEBA")
+    titulo_rosa("Distribución de Bernoulli")
     parrafo_adaptable(
         "Un experimento de Bernoulli es un proceso estadístico con dos posibles resultados: "
         "<strong>Éxito</strong> (1) o <strong>Fracaso</strong> (0). "
