@@ -231,7 +231,7 @@ def renderizar_analisis_y_reportes_gamma(alpha, beta, N_global, media_sim, var_s
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Efecto Teórico:** Observa cómo al cambiar $\\alpha$ a valores grandes, el histograma se vuelve más simétrico y se asemeja paulatinamente a una distribución Normal, cumpliendo con el Teorema Central del Límite.")
+        st.info("**Efecto Teórico:** Se puede observar cómo al cambiar $\\alpha$ a valores grandes, el histograma se vuelve más simétrico y se asemeja paulatinamente a una distribución Normal, cumpliendo con el Teorema Central del Límite.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
@@ -301,15 +301,12 @@ def renderizar_tlc_gamma(alpha, beta):
             min_value=2, max_value=100, value=30, step=1, key="tlc_gamma_k"
         )
 
-    # Generación matricial optimizada (m experimentos de muestras tamaño k)
     matriz_gamma = np.random.gamma(shape=alpha, scale=beta, size=(num_muestras, tam_muestra_tlc))
     promedios_muestrales = np.mean(matriz_gamma, axis=1)
     
-    # Renderizado gráfico de los promedios frente a la Campana Gaussiana teórica
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
     
-    # Parámetros esperados según el TLC
     mu_teo_tlc = alpha * beta
     sigma_teo_tlc = (np.sqrt(alpha) * beta) / np.sqrt(tam_muestra_tlc)
     
@@ -332,7 +329,7 @@ def renderizar_tlc_gamma(alpha, beta):
         st.write("### Convergencia Estadística")
         st.markdown(f"* **Media de Promedios:** {np.mean(promedios_muestrales):.4f} (Teórica: {mu_teo_tlc:.4f})")
         st.markdown(f"* **Error Estándar Muestral:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_teo_tlc:.4f})")
-        st.info("💡 Observa cómo incluso si fijas una forma $\\alpha$ pequeña (muy asimétrica), al incrementar **k** en el slider, los promedios se amoldan con asombrosa precisión bajo la campana discontinua.")
+        st.info("Se puede observar cómo incluso si se fija una forma $\\alpha$ pequeña (muy asimétrica), al incrementar **k** en el slider, los promedios se amoldan con asombrosa precisión bajo la campana discontinua.")
 
 def inicializar_gamma():
     st.markdown("""
