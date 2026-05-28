@@ -1,4 +1,3 @@
-# subpaginas/normal.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -212,6 +211,8 @@ def renderizar_analisis_y_reportes_normal(mu, sigma, N_global, media_sim, var_si
     var_teo = sigma ** 2
     desv_teo = sigma
 
+    pdf_valores = norm.pdf(datos_raw, loc=mu, scale=sigma)
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Centro teórico configurado: **{mu}**")
@@ -227,7 +228,7 @@ def renderizar_analisis_y_reportes_normal(mu, sigma, N_global, media_sim, var_si
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Nota Teórica de Densidad:** Al superponer las gráficas, se puede apreciar la regla empírica. Aproximadamente el 68% de los datos experimentales caerán de manera natural dentro del rango de una desviación estándar respecto al centro.")
+        st.info("**Nota Teórica de Densidad:** Al superponer las gráficas, se puede apreciar la regla empírica. Aproximadamente el 68.27% de los datos experimentales caerán de manera natural dentro del rango de una desviación estándar respecto al centro.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
@@ -237,12 +238,19 @@ def renderizar_analisis_y_reportes_normal(mu, sigma, N_global, media_sim, var_si
             st.markdown("**Regla de Probabilidad Empírica:**")
             st.latex(r"P(\mu - \sigma \le X \le \mu + \sigma) \approx 0.6827")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Valores Continuos (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PDF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Valores Continuos (X)": datos_raw,
+                "PDF Teórica f(X)": pdf_valores
+            })
             df_inspeccion.index.name = "ID_Muestra"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption("Visualización de las primeras 10 coordenadas continuas junto a su altura de densidad teórica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Valores_Normal_Gaussiana"])
+        df_descarga = pd.DataFrame({
+            "Valores_Normal_Gaussiana": datos_raw,
+            "PDF_Teorica": pdf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="ID")
         col_btn1, col_btn2 = st.columns(2)
         
@@ -267,6 +275,58 @@ def renderizar_analisis_y_reportes_normal(mu, sigma, N_global, media_sim, var_si
                 label="Descargar TXT", data=reporte_texto,
                 key="dl_txt_norm", file_name=f"reporte_normal_mu{mu}_sigma{sigma}.txt", mime="text/plain", use_container_width=True
             )
+
+def renderizar_tlc_normal(mu, sigma):
+    st.markdown("---")
+    st.subheader("Demostración de Reproductibilidad (TLC en Variables Normales)")
+    
+    parrafo_adaptable(
+        "Una propiedad fundamental de las variables aleatorias normales independientes es su "
+        "<strong>estabilidad</strong>. Si tomamos muestras de una población normal y calculamos sus promedios, "
+        "estos promedios se distribuirán de forma estrictamente Normal, conservando la media exacta "
+        "pero reduciendo la dispersión por un factor de <strong>1 / √k</strong>."
+    )
+    
+    col_c1, col_c2 = st.columns(2, gap="large")
+    with col_c1:
+        num_muestras = st.slider(
+            "Número de promedios calculados (m):", 
+            min_value=100, max_value=5000, value=2000, step=100, key="tlc_norm_m"
+        )
+    with col_c2:
+        tam_muestra_tlc = st.slider(
+            "Tamaño de cada muestra agrupada (k):", 
+            min_value=2, max_value=100, value=30, step=1, key="tlc_norm_k"
+        )
+
+    matriz_norm = np.random.normal(loc=mu, scale=sigma, size=(num_muestras, tam_muestra_tlc))
+    promedios_muestrales = np.mean(matriz_norm, axis=1)
+    
+    fig, ax = plt.subplots(figsize=(7, 3.5))
+    ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
+    
+    mu_tlc = mu
+    sigma_tlc = sigma / np.sqrt(tam_muestra_tlc)
+    
+    xmin, xmax = ax.get_xlim()
+    x_axis = np.linspace(xmin, xmax, 100)
+    curve_teorica = (1 / (sigma_tlc * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x_axis - mu_tlc) / sigma_tlc)**2)
+    ax.plot(x_axis, curve_teorica, color='#31333F', linewidth=2.5, linestyle='--', label='Tendencia Normal Teórica')
+    
+    ax.set_title(f"Distribución de {num_muestras:,} Promedios (Muestras de tamaño k = {tam_muestra_tlc})", fontsize=10, fontweight='bold')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.legend(loc='upper right', frameon=False, fontsize=8)
+    ax.grid(axis='y', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+    
+    col_graf, col_info = st.columns([1.8, 1.2], gap="large")
+    with col_graf:
+        st.pyplot(fig, use_container_width=True)
+    with col_info:
+        st.write("### Evidencia de Estabilidad")
+        st.markdown(f"* **Media de Promedios:** {np.mean(promedios_muestrales):.4f} (Teórica: {mu_tlc:.4f})")
+        st.markdown(f"* **Error Estándar Muestral:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_tlc:.4f})")
 
 def inicializar_normal():
     st.markdown("""
@@ -309,3 +369,5 @@ def inicializar_normal():
     renderizar_analisis_y_reportes_normal(
         mu_val, sigma_val, N_global, media_sim, var_sim, desv_sim, datos_raw
     )
+
+    renderizar_tlc_normal(mu_val, sigma_val)
