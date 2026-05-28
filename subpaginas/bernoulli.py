@@ -1,8 +1,8 @@
-# subpaginas/bernoulli.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.stats import bernoulli
 from css.estilos import titulo_rosa, parrafo_adaptable
 
 def intro_bernoulli():
@@ -214,6 +214,9 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
     var_teorica = p_teorica * q_teorica
     desv_teorica = np.sqrt(var_teorica)
 
+    pmf_exito = float(bernoulli.pmf(1, p_teorica))
+    pmf_fracaso = float(bernoulli.pmf(0, p_teorica))
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         p_simulada_porcentaje = (exitos_sim / n_muestra_final)
@@ -234,22 +237,30 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
         if n_muestra_final >= 5000:
-            st.info(" **Nota de Laboratorio:** Al usar un tamaño de muestra grande,  las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
+            st.info("Nota de Laboratorio: Al usar un tamaño de muestra grande, las diferencias analíticas son mínimas. Esto demuestra de forma práctica el teorema de la Ley de los Grandes Números.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
 
         with st.expander("Ver Formulas Teoricas"):
+            st.latex(r"P(X=x) = p^x (1-p)^{1-x} \quad \text{para } x \in \{0, 1\}")
             st.latex(r"p + q = 1 \quad \lhd \quad \mu = p")
             st.latex(r"\sigma^2 = p \cdot q \quad \lhd \quad \sigma = \sqrt{p \cdot q}")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Valor Obtenido (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PMF Teórica"):
+            pmf_valores = bernoulli.pmf(datos_raw, p_teorica)
+            df_inspeccion = pd.DataFrame({
+                "Valor Obtenido (X)": datos_raw,
+                "PMF Teórica P(X=x)": pmf_valores
+            })
             df_inspeccion.index.name = "ID_Experimento"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
             st.caption(f"Mostrando los primeros 10 renglones experimentales de los {n_muestra_final:,} totales.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Resultado_Simulacion"])
+        df_descarga = pd.DataFrame({
+            "Resultado_Simulacion": datos_raw,
+            "PMF_Teorica": pmf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="Iteracion")
         col_btn1, col_btn2 = st.columns(2)
         
@@ -263,6 +274,9 @@ def renderizar_analisis_y_reportes(p_teorica, q_teorica, n_muestra_final, exitos
             reporte_texto = (
                 f"REPORTE DE LABORATORIO - DISTRIBUCION DE BERNOULLI\n"
                 f"--------------------------------------------------\n"
+                f"Función de Masa de Probabilidad (PMF):\n"
+                f"P(X=1) [Éxito]: {pmf_exito:.4f}\n"
+                f"P(X=0) [Fracaso]: {pmf_fracaso:.4f}\n\n"
                 f"Concepto                Valor Teorico   Valor Simulado   Diferencia\n"
                 f"Media (mu / x-barra):    {media_teorica:.4f}          {media_simulada:.4f}           {abs(media_teorica - media_simulada):.4f}\n"
                 f"Varianza (sigma2 / s2):  {var_teorica:.4f}          {var_simulada:.4f}           {abs(var_teorica - var_simulada):.4f}\n"
