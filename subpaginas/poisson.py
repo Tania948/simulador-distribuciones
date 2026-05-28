@@ -212,7 +212,7 @@ def renderizar_analisis_y_reportes_poisson(lam, N_global, media_sim, var_sim, de
         df_comparativo = pd.DataFrame(datos_tabla)
         st.dataframe(df_comparativo, hide_index=True, use_container_width=True)
         
-        st.info("**Propiedad de Equidistribución:** Una característica única de Poisson es que su media es exactamente igual a su varianza ($\mu = \sigma^2 = \lambda$). Puedes ver que en los datos simulados los valores de x̄ y s² se persiguen muy de cerca.")
+        st.info("**Propiedad de Equidistribución:** Una característica única de Poisson es que su media es exactamente igual a su varianza ($\mu = \sigma^2 = \lambda$). Se puede apreciar que en los datos simulados los valores de x̄ y s² se persiguen muy de cerca.")
 
     with col_der_inf:
         st.write("### Herramientas y Reportes")
