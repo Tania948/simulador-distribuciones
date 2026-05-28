@@ -214,6 +214,9 @@ def renderizar_analisis_y_reportes_gamma(alpha, beta, N_global, media_sim, var_s
     var_teo = alpha * (beta ** 2)
     desv_teo = np.sqrt(var_teo)
 
+    # Cálculo matemático explícito de la altura de la PDF teórica individual
+    pdf_valores = gamma.pdf(datos_raw, a=alpha, scale=beta)
+
     with col_izq_inf:
         st.write("### Interpretación y Comparación")
         st.write(f"Forma configurada ($\\alpha$): **{alpha}** | Escala configurada ($\\beta$): **{beta}**")
@@ -238,12 +241,19 @@ def renderizar_analisis_y_reportes_gamma(alpha, beta, N_global, media_sim, var_s
             st.latex(r"\mu = \alpha\beta")
             st.latex(r"\sigma^2 = \alpha\beta^2")
 
-        with st.expander("Inspeccionar Muestra Cruda Generada"):
-            df_inspeccion = pd.DataFrame({"Valores Gamma (X)": datos_raw})
+        with st.expander("Inspeccionar Muestra Cruda y PDF Teórica"):
+            df_inspeccion = pd.DataFrame({
+                "Valores Gamma (X)": datos_raw,
+                "PDF Teórica f(X)": pdf_valores
+            })
             df_inspeccion.index.name = "ID_Muestra"
             st.dataframe(df_inspeccion.head(10), use_container_width=True)
+            st.caption("Visualización de los primeros 10 registros numéricos continuos junto a su densidad analítica.")
 
-        df_descarga = pd.DataFrame(datos_raw, columns=["Valores_Gamma"])
+        df_descarga = pd.DataFrame({
+            "Valores_Gamma": datos_raw,
+            "PDF_Teorica": pdf_valores
+        })
         csv_data = df_descarga.to_csv(index=True, index_label="ID")
         col_btn1, col_btn2 = st.columns(2)
         
@@ -268,6 +278,61 @@ def renderizar_analisis_y_reportes_gamma(alpha, beta, N_global, media_sim, var_s
                 label="Descargar TXT", data=reporte_texto,
                 key="dl_txt_gamma", file_name=f"reporte_gamma_a{alpha}_b{beta}.txt", mime="text/plain", use_container_width=True
             )
+
+def renderizar_tlc_gamma(alpha, beta):
+    st.markdown("---")
+    st.subheader("Demostración del Teorema del Límite Central (TLC)")
+    
+    parrafo_adaptable(
+        "El TLC postula que la suma o promedio de un conjunto de <strong>k</strong> variables aleatorias "
+        "independientes e idénticamente distribuidas (i.i.d.) convergerá hacia una distribución Normal "
+        "a medida que el tamaño de agrupación aumente, independientemente de la asimetría original de la función origen."
+    )
+    
+    col_c1, col_c2 = st.columns(2, gap="large")
+    with col_c1:
+        num_muestras = st.slider(
+            "Número de promedios calculados (m):", 
+            min_value=100, max_value=5000, value=2000, step=100, key="tlc_gamma_m"
+        )
+    with col_c2:
+        tam_muestra_tlc = st.slider(
+            "Tamaño de cada muestra agrupada (k):", 
+            min_value=2, max_value=100, value=30, step=1, key="tlc_gamma_k"
+        )
+
+    # Generación matricial optimizada (m experimentos de muestras tamaño k)
+    matriz_gamma = np.random.gamma(shape=alpha, scale=beta, size=(num_muestras, tam_muestra_tlc))
+    promedios_muestrales = np.mean(matriz_gamma, axis=1)
+    
+    # Renderizado gráfico de los promedios frente a la Campana Gaussiana teórica
+    fig, ax = plt.subplots(figsize=(7, 3.5))
+    ax.hist(promedios_muestrales, bins=25, density=True, color='#E04D98', alpha=0.7, edgecolor='white', label='Promedios Muestrales')
+    
+    # Parámetros esperados según el TLC
+    mu_teo_tlc = alpha * beta
+    sigma_teo_tlc = (np.sqrt(alpha) * beta) / np.sqrt(tam_muestra_tlc)
+    
+    xmin, xmax = ax.get_xlim()
+    x_axis = np.linspace(xmin, xmax, 100)
+    curve_teorica = (1 / (sigma_teo_tlc * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x_axis - mu_teo_tlc) / sigma_teo_tlc)**2)
+    ax.plot(x_axis, curve_teorica, color='#31333F', linewidth=2.5, linestyle='--', label='Campana Gaussiana Límite')
+    
+    ax.set_title(f"Distribución de {num_muestras:,} Promedios (Muestras de tamaño k = {tam_muestra_tlc})", fontsize=10, fontweight='bold')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.legend(loc='upper right', frameon=False, fontsize=8)
+    ax.grid(axis='y', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+    
+    col_graf, col_info = st.columns([1.8, 1.2], gap="large")
+    with col_graf:
+        st.pyplot(fig, use_container_width=True)
+    with col_info:
+        st.write("### Convergencia Estadística")
+        st.markdown(f"* **Media de Promedios:** {np.mean(promedios_muestrales):.4f} (Teórica: {mu_teo_tlc:.4f})")
+        st.markdown(f"* **Error Estándar Muestral:** {np.std(promedios_muestrales):.4f} (Teórico: {sigma_teo_tlc:.4f})")
+        st.info("💡 Observa cómo incluso si fijas una forma $\\alpha$ pequeña (muy asimétrica), al incrementar **k** en el slider, los promedios se amoldan con asombrosa precisión bajo la campana discontinua.")
 
 def inicializar_gamma():
     st.markdown("""
@@ -310,3 +375,6 @@ def inicializar_gamma():
     renderizar_analisis_y_reportes_gamma(
         alpha_val, beta_val, N_global, media_sim, var_sim, desv_sim, datos_raw
     )
+
+    # Invocación final interactiva del TLC
+    renderizar_tlc_gamma(alpha_val, beta_val)
